@@ -1,0 +1,139 @@
+Altera SOPC Builder Version 6.00 Build 202
+Copyright (c) 1999-2006 Altera Corporation.  All rights reserved.
+
+
+# 2006.10.12 17:51:40 (*) mk_custom_sdk starting
+# 2006.10.12 17:51:40 (*) Reading project C:/source/boards/Projects/CII_Starter_Kit-v6.0.1/Examples/CII_Starter_demonstrations/CII_Starter_SD_Card_Audio/system_0.ptf.
+
+# 2006.10.12 17:51:40 (*) Finding all CPUs
+# 2006.10.12 17:51:40 (*) Finding all available components
+# 2006.10.12 17:51:40 (*) Reading C:/source/boards/Projects/CII_Starter_Kit-v6.0.1/Examples/CII_Starter_demonstrations/CII_Starter_SD_Card_Audio/.sopc_builder/install.ptf
+
+# 2006.10.12 17:51:40 (*) Found 63 components
+
+# 2006.10.12 17:51:42 (*) Finding all peripherals
+
+# 2006.10.12 17:51:42 (*) Finding software components
+
+# 2006.10.12 17:51:43 (*) (Legacy SDK Generation Skipped)
+# 2006.10.12 17:51:43 (*) (All TCL Script Generation Skipped)
+# 2006.10.12 17:51:43 (*) (No Libraries Built)
+# 2006.10.12 17:51:43 (*) (Contents Generation Skipped)
+# 2006.10.12 17:51:43 (*) mk_custom_sdk finishing
+
+# 2006.10.12 17:51:43 (*) Starting generation for system: system_0.
+
+.
+.
+.
+.
+.
+.
+..
+...
+.
+.
+.
+....
+..
+
+# 2006.10.12 17:51:46 (*) Running Generator Program for cpu_0
+
+# 2006.10.12 17:51:50 (*)   Checking for plaintext license.
+# 2006.10.12 17:51:55 (*)   Plaintext license not found.
+# 2006.10.12 17:51:55 (*)   Checking for encrypted license (non-evaluation).
+# 2006.10.12 17:51:56 (*)   Encrypted license found.  SOF will not be time-limited.
+# 2006.10.12 17:52:13 (*)   Creating encrypted HDL
+
+# 2006.10.12 17:52:17 (*) Running Generator Program for cfi_flash_0
+
+# 2006.10.12 17:52:19 (*) Running Generator Program for sdram_0
+
+# 2006.10.12 17:52:21 (*) Running Generator Program for epcs_controller
+
+# 2006.10.12 17:52:24 (*) Running Generator Program for jtag_uart_0
+
+# 2006.10.12 17:52:27 (*) Running Generator Program for uart_0
+
+# 2006.10.12 17:52:32 (*) Running Generator Program for timer_0
+
+# 2006.10.12 17:52:35 (*) Running Generator Program for timer_1
+
+# 2006.10.12 17:52:38 (*) Running Generator Program for led_red
+
+# 2006.10.12 17:52:41 (*) Running Generator Program for led_green
+
+# 2006.10.12 17:52:43 (*) Running Generator Program for button_pio
+
+# 2006.10.12 17:52:46 (*) Running Generator Program for switch_pio
+
+# 2006.10.12 17:52:49 (*) Running Generator Program for SEG7_Display
+
+# 2006.10.12 17:52:53 (*) Running Generator Program for sram_0
+
+# 2006.10.12 17:52:58 (*) Running Generator Program for Audio_0
+
+# 2006.10.12 17:53:02 (*) Running Generator Program for SD_DAT
+
+# 2006.10.12 17:53:04 (*) Running Generator Program for SD_CMD
+
+# 2006.10.12 17:53:06 (*) Running Generator Program for SD_CLK
+
+# 2006.10.12 17:53:08 (*) Running Generator Program for clock_0
+
+# 2006.10.12 17:53:10 (*) Running Generator Program for clock_1
+
+.
+
+
+# 2006.10.12 17:53:13 (*) Running Test Generator Program for sdram_0
+
+# 2006.10.12 17:53:14 (*) Making arbitration and system (top) modules.
+
+# 2006.10.12 17:53:36 (*) Generating Quartus symbol for top level: system_0
+
+# 2006.10.12 17:53:36 (*) Symbol C:/source/boards/Projects/CII_Starter_Kit-v6.0.1/Examples/CII_Starter_demonstrations/CII_Starter_SD_Card_Audio/system_0.bsf already exists, no need to regenerate
+# 2006.10.12 17:53:36 (*) Creating command-line system-generation script: C:/source/boards/Projects/CII_Starter_Kit-v6.0.1/Examples/CII_Starter_demonstrations/CII_Starter_SD_Card_Audio/system_0_generation_script
+
+# 2006.10.12 17:53:36 (*) Running setup for HDL simulator: modelsim
+
+
+# 2006.10.12 17:53:36 (*) Setting up Quartus with system_0_setup_quartus.tcl
+c:/altera/quartus60/bin/quartus_sh -t system_0_setup_quartus.tcl
+
+
+Info: *******************************************************************
+Info: Running Quartus II Shell
+    Info: Version 6.0 Build 202 06/20/2006 Service Pack 1 SJ Full Version
+    Info: Copyright (C) 1991-2006 Altera Corporation. All rights reserved.
+    Info: Your use of Altera Corporation's design tools, logic functions 
+    Info: and other software and tools, and its AMPP partner logic 
+    Info: functions, and any output files any of the foregoing 
+    Info: (including device programming or simulation files), and any 
+    Info: associated documentation or information are expressly subject 
+    Info: to the terms and conditions of the Altera Program License 
+    Info: Subscription Agreement, Altera MegaCore Function License 
+    Info: Agreement, or other applicable license agreement, including, 
+    Info: without limitation, that your use is for the sole purpose of 
+    Info: programming logic devices manufactured by Altera and sold by 
+    Info: Altera or its authorized distributors.  Ple
+ase refer to the 
+    Info: applicable agreement for further details.
+    Info: Processing started: Thu Oct 12 17:53:37 2006
+Info: Command: quartus_sh -t system_0_setup_quartus.tcl
+Info: Evaluation of Tcl script system_0_setup_quartus.tcl was successful
+Info: Quartus II Shell was successful. 0 errors, 0 warnings
+    Info: Processing ended: Thu Oct 12 17:53:37 2006
+    Info: Elapsed time: 00:00:01
+
+# 2006.10.12 17:53:37 (*) Completed generation for system: system_0.
+# 2006.10.12 17:53:37 (*) THE FOLLOWING SYSTEM ITEMS HAVE BEEN GENERATED:
+  SOPC Builder database : C:/source/boards/Projects/CII_Starter_Kit-v6.0.1/Examples/CII_Starter_demonstrations/CII_Starter_SD_Card_Audio/system_0.ptf 
+  System HDL Model : C:/source/boards/Projects/CII_Starter_Kit-v6.0.1/Examples/CII_Starter_demonstrations/CII_Starter_SD_Card_Audio/system_0.v 
+  System Generation Script : C:/source/boards/Projects/CII_Starter_Kit-v6.0.1/Examples/CII_Starter_demonstrations/CII_Starter_SD_Card_Audio/system_0_generation_script 
+
+
+# 2006.10.12 17:53:37 (*) SUCCESS: SYSTEM GENERATION COMPLETED.
+
+
+Press 'Exit' to exit.

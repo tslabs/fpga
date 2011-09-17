@@ -1,0 +1,98 @@
+Flow report for CII_Starter_SD_Card_Audio
+Thu Oct 12 18:01:09 2006
+Version 6.0 Build 202 06/20/2006 Service Pack 1 SJ Full Version
+
+
+---------------------
+; Table of Contents ;
+---------------------
+  1. Legal Notice
+  2. Flow Summary
+  3. Flow Settings
+  4. Flow Non-Default Global Settings
+  5. Flow Elapsed Time
+  6. Flow Log
+
+
+
+----------------
+; Legal Notice ;
+----------------
+Copyright (C) 1991-2006 Altera Corporation
+Your use of Altera Corporation's design tools, logic functions 
+and other software and tools, and its AMPP partner logic 
+functions, and any output files any of the foregoing 
+(including device programming or simulation files), and any 
+associated documentation or information are expressly subject 
+to the terms and conditions of the Altera Program License 
+Subscription Agreement, Altera MegaCore Function License 
+Agreement, or other applicable license agreement, including, 
+without limitation, that your use is for the sole purpose of 
+programming logic devices manufactured by Altera and sold by 
+Altera or its authorized distributors.  Please refer to the 
+applicable agreement for further details.
+
+
+
++------------------------------------------------------------------------------------+
+; Flow Summary                                                                       ;
++------------------------------------+-----------------------------------------------+
+; Flow Status                        ; Successful - Thu Oct 12 18:01:08 2006         ;
+; Quartus II Version                 ; 6.0 Build 202 06/20/2006 SP 1 SJ Full Version ;
+; Revision Name                      ; CII_Starter_SD_Card_Audio                     ;
+; Top-level Entity Name              ; CII_Starter_SD_Card_Audio                     ;
+; Family                             ; Cyclone II                                    ;
+; Device                             ; EP2C20F484C7                                  ;
+; Timing Models                      ; Final                                         ;
+; Met timing requirements            ; Yes                                           ;
+; Total logic elements               ; 4,900 / 18,752 ( 26 % )                       ;
+; Total registers                    ; 3069                                          ;
+; Total pins                         ; 287 / 315 ( 91 % )                            ;
+; Total virtual pins                 ; 0                                             ;
+; Total memory bits                  ; 79,360 / 239,616 ( 33 % )                     ;
+; Embedded Multiplier 9-bit elements ; 4 / 52 ( 8 % )                                ;
+; Total PLLs                         ; 2 / 4 ( 50 % )                                ;
++------------------------------------+-----------------------------------------------+
+
+
++-----------------------------------------------+
+; Flow Settings                                 ;
++-------------------+---------------------------+
+; Option            ; Setting                   ;
++-------------------+---------------------------+
+; Start date & time ; 10/12/2006 17:53:54       ;
+; Main task         ; Compilation               ;
+; Revision Name     ; CII_Starter_SD_Card_Audio ;
++-------------------+---------------------------+
+
+
++--------------------------------------------------------------------+
+; Flow Non-Default Global Settings                                   ;
++-----------------+-------+---------------+-------------+------------+
+; Assignment Name ; Value ; Default Value ; Entity Name ; Section Id ;
++-----------------+-------+---------------+-------------+------------+
+
+
++-------------------------------------+
+; Flow Elapsed Time                   ;
++----------------------+--------------+
+; Module Name          ; Elapsed Time ;
++----------------------+--------------+
+; Analysis & Synthesis ; 00:02:16     ;
+; Fitter               ; 00:04:24     ;
+; Assembler            ; 00:00:12     ;
+; Timing Analyzer      ; 00:00:14     ;
+; Total                ; 00:07:06     ;
++----------------------+--------------+
+
+
+------------
+; Flow Log ;
+------------
+quartus_map --read_settings_files=on --write_settings_files=off CII_Starter_SD_Card_Audio -c CII_Starter_SD_Card_Audio
+quartus_fit --read_settings_files=off --write_settings_files=off CII_Starter_SD_Card_Audio -c CII_Starter_SD_Card_Audio
+quartus_asm --read_settings_files=off --write_settings_files=off CII_Starter_SD_Card_Audio -c CII_Starter_SD_Card_Audio
+quartus_tan --read_settings_files=off --write_settings_files=off CII_Starter_SD_Card_Audio -c CII_Starter_SD_Card_Audio --timing_analysis_only
+
+
+

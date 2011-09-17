@@ -1,0 +1,233 @@
+CLASS user_logic_SRAM_16Bits_512K
+{
+   ASSOCIATED_FILES 
+   {
+      Add_Program = "";
+      Edit_Program = "";
+      Generator_Program = "mk_user_logic_SRAM_16Bits_512K.pl";
+   }
+   MODULE_DEFAULTS 
+   {
+      class = "user_logic_SRAM_16Bits_512K";
+      class_version = "2.0";
+      SYSTEM_BUILDER_INFO 
+      {
+         Instantiate_In_System_Module = "1";
+         Is_Enabled = "1";
+         Date_Modified = "--unknown--";
+         Clock_Source = "clk";
+      }
+      WIZARD_SCRIPT_ARGUMENTS 
+      {
+      }
+      SLAVE avalonS
+      {
+         SYSTEM_BUILDER_INFO 
+         {
+            Bus_Type = "avalon";
+            Address_Alignment = "dynamic";
+            Address_Width = "18";
+            Data_Width = "16";
+            Has_IRQ = "0";
+            Has_Base_Address = "1";
+            Read_Wait_States = "20ns";
+            Write_Wait_States = "20ns";
+            Setup_Time = "20ns";
+            Hold_Time = "20ns";
+            Is_Memory_Device = "1";
+            Uses_Tri_State_Data_Bus = "0";
+            Is_Enabled = "1";
+         }
+         PORT_WIRING 
+         {
+            PORT oDATA
+            {
+               width = "16";
+               direction = "output";
+               type = "readdata";
+            }
+            PORT iDATA
+            {
+               width = "16";
+               direction = "input";
+               type = "writedata";
+            }
+            PORT iADDR
+            {
+               width = "18";
+               direction = "input";
+               type = "address";
+            }
+            PORT iWE_N
+            {
+               width = "1";
+               direction = "input";
+               type = "write_n";
+            }
+            PORT iOE_N
+            {
+               width = "1";
+               direction = "input";
+               type = "outputenable_n";
+            }
+            PORT iCE_N
+            {
+               width = "1";
+               direction = "input";
+               type = "chipselect_n";
+            }
+            PORT iRST_N
+            {
+               width = "1";
+               direction = "input";
+               type = "reset_n";
+            }
+            PORT iUB_N
+            {
+               width = "1";
+               direction = "input";
+               type = "byteenable_n";
+            }
+            PORT iLB_N
+            {
+               width = "1";
+               direction = "input";
+               type = "byteenable_n";
+            }
+            PORT SRAM_DQ
+            {
+               width = "16";
+               direction = "inout";
+               type = "export";
+            }
+            PORT SRAM_ADDR
+            {
+               width = "18";
+               direction = "output";
+               type = "export";
+            }
+            PORT SRAM_UB_N
+            {
+               width = "1";
+               direction = "output";
+               type = "export";
+            }
+            PORT SRAM_LB_N
+            {
+               width = "1";
+               direction = "output";
+               type = "export";
+            }
+            PORT SRAM_WE_N
+            {
+               width = "1";
+               direction = "output";
+               type = "export";
+            }
+            PORT SRAM_CE_N
+            {
+               width = "1";
+               direction = "output";
+               type = "export";
+            }
+            PORT SRAM_OE_N
+            {
+               width = "1";
+               direction = "output";
+               type = "export";
+            }
+         }
+      }
+      SIMULATION 
+      {
+         DISPLAY 
+         {
+            SIGNAL a
+            {
+               name = "oDATA";
+               radix = "hexadecimal";
+            }
+            SIGNAL b
+            {
+               name = "iDATA";
+               radix = "hexadecimal";
+            }
+            SIGNAL c
+            {
+               name = "iADDR";
+               radix = "hexadecimal";
+            }
+            SIGNAL d
+            {
+               name = "iWE_N";
+            }
+            SIGNAL e
+            {
+               name = "iOE_N";
+            }
+            SIGNAL f
+            {
+               name = "iCE_N";
+            }
+            SIGNAL g
+            {
+               name = "iRST_N";
+            }
+            SIGNAL h
+            {
+               name = "iUB_N";
+            }
+            SIGNAL i
+            {
+               name = "iLB_N";
+            }
+            SIGNAL j
+            {
+               name = "SRAM_DQ";
+               radix = "hexadecimal";
+            }
+            SIGNAL k
+            {
+               name = "SRAM_ADDR";
+               radix = "hexadecimal";
+            }
+            SIGNAL l
+            {
+               name = "SRAM_UB_N";
+            }
+            SIGNAL m
+            {
+               name = "SRAM_LB_N";
+            }
+            SIGNAL n
+            {
+               name = "SRAM_WE_N";
+            }
+            SIGNAL o
+            {
+               name = "SRAM_CE_N";
+            }
+            SIGNAL p
+            {
+               name = "SRAM_OE_N";
+            }
+         }
+      }
+   }
+   USER_INTERFACE 
+   {
+      USER_LABELS 
+      {
+         name = "SRAM_16Bits_512K";
+         technology = "User Logic";
+      }
+   }
+   DEFAULT_GENERATOR 
+   {
+      top_module_name = "SRAM_16Bit_512K";
+      black_box = "0";
+      vhdl_synthesis_files = "";
+      verilog_synthesis_files = "SRAM_16Bit_512K.v";
+      black_box_files = "";
+   }
+}
