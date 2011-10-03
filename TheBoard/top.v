@@ -50,10 +50,10 @@ output			SRAM_WE_N,				//	SRAM Write Enable
 output			SRAM_CE_N,				//	SRAM Chip Enable
 output			SRAM_OE_N,				//	SRAM Output Enable
 // SD Card
-inout			SD_DO,					//	SD Card Data Out
-inout			SD_CS_N,	    		//	SD Card Chip Select
-inout			SD_DI,					//	SD Card Data In
+output			SD_CS_N,	    		//	SD Card Chip Select
 output			SD_CLK,					//	SD Card Clock
+output			SD_DO,					//	SD Card Data Out
+input			SD_DI,					//	SD Card Data In
 // I2C
 inout			I2C_SDAT,				//	I2C Data
 output			I2C_SCLK,				//	I2C Clock
