@@ -12,9 +12,9 @@ always @(posedge clk)
     if (en)
     case(dig)
     2'h0: seg[ 6: 0] <= led;
-    2'h1: seg[12: 7] <= led;
-    2'h2: seg[18:13] <= led;
-    2'h3: seg[27:19] <= led;
+    2'h1: seg[13: 7] <= led;
+    2'h2: seg[20:14] <= led;
+    2'h3: seg[27:21] <= led;
     endcase
 
 
@@ -31,7 +31,7 @@ always @*
 	4'h6: led = 7'b0000010; 
 	4'h7: led = 7'b1111000; 
 	4'h8: led = 7'b0000000; 
-	4'h9: led = 7'b0011000; 
+	4'h9: led = 7'b0010000; 
 	4'hA: led = 7'b0001000;
 	4'hB: led = 7'b0000011;
 	4'hC: led = 7'b1000110;
