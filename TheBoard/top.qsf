@@ -338,7 +338,6 @@ set_global_assignment -name CYCLONEII_OPTIMIZATION_TECHNIQUE SPEED
 set_global_assignment -name USE_TIMEQUEST_TIMING_ANALYZER ON
 set_global_assignment -name SAVE_DISK_SPACE OFF
 set_global_assignment -name SMART_RECOMPILE ON
-set_global_assignment -name VERILOG_FILE top.v
 set_global_assignment -name FLOW_ENABLE_IO_ASSIGNMENT_ANALYSIS OFF
 set_global_assignment -name FLOW_ENABLE_RTL_VIEWER OFF
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
@@ -346,3 +345,6 @@ set_global_assignment -name ON_CHIP_BITSTREAM_DECOMPRESSION OFF
 set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "3.3-V LVTTL"
 set_instance_assignment -name PARTITION_HIERARCHY no_file_for_top_partition -to | -section_id Top
 set_global_assignment -name CYCLONEII_RESERVE_NCEO_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name VERILOG_FILE top.v
+set_global_assignment -name VERILOG_FILE hex.v
+set_global_assignment -name VERILOG_FILE pll.v
