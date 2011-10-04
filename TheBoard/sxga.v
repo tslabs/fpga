@@ -1,14 +1,11 @@
 module 	sxga(
 
 	input  wire	        	clk,
-	// output wire	[3:0]		vred,
-	// output wire	[3:0]		vgrn,
-	// output wire	[3:0]		vblu,
+	output reg	[3:0]		r,
+	output reg	[3:0]		g,
+	output reg	[3:0]		b,
 	output reg				hsync,
 	output reg				vsync,
-	output wire [10:0]		haddr,
-	output wire [10:0]		vaddr,
-	output wire				vis
 
 );
 
@@ -32,24 +29,39 @@ module 	sxga(
 	
 	reg	[10:0]	hcnt;
 	reg	[10:0]	vcnt;
-	reg			hvis;
-	reg			vvis;
-	
-	assign		vis = hvis && vvis;
+	reg			vvis;           // vertical pixels window
+	reg			hfetch;         // window for fetching
 	
 	wire eol = (hcnt == (HTOTAL - 1));
 	wire hss = (hcnt == (HSYNC - 1));
 	wire hse = (hcnt == (HBACK - 1));
-	wire hvs = (hcnt == (HVISIBLE - 1));
+	wire hfs = (hcnt == (HVISIBLE - 2));
+	wire hfe = (hcnt == (HTOTAL - 2));
 	
 	wire eof = (vcnt == (VTOTAL - 1));
 	wire vss = (vcnt == (VSYNC - 1));
 	wire vse = (vcnt == (VBACK - 1));
 	wire vvs = (vcnt == (VVISIBLE - 1));
 
-	assign haddr = hcnt - HVISIBLE + 2;
-	assign vaddr = vcnt - VVISIBLE;
+	wire [10:0] haddr = hcnt - HVISIBLE + 1;
+	wire [10:0] vaddr = vcnt - VVISIBLE;
 
+
+// SRAM part
+  	assign sram_addr = {vaddr[8:0], haddr[8:0]};
+	assign sram_ce_n = hfetch;
+	assign sram_oe_n = hfetch;
+	assign sram_lb_n = 1'b0;
+	assign sram_ub_n = 1'b0;
+	assign sram_we_n = 1'b1;
+	
+    always @(posedge clk)
+    begin
+        r <= hfetch && sw[9] ? sram_dq[15:12] : 4'b0;
+        g <= hfetch && sw[8] ? sram_dq[10: 7] : 4'b0;
+        b <= hfetch && sw[7] ? sram_dq[ 4: 1] : 4'b0;
+    end
+    
 	
 // horizontal part
 	always @(posedge clk)
@@ -65,11 +77,11 @@ module 	sxga(
 		else if (hse)
 			hsync <= 1'b1;
 
-		if (hvs)
-			hvis <= 1'b1;
-		else if (eol)
-			hvis <= 1'b0;
-
+		if (hfs && vvis)
+			hfetch <= 1'b1;
+		else if (hfe)
+			hfetch <= 1'b0;
+        
 	end
 
 
@@ -97,11 +109,5 @@ module 	sxga(
 		end
 	end
 
-	
-
-	// assign vred = vis ? {hcnt1[0],hcnt1[7:5]} : 4'b0;
-	// assign vgrn = vis ? hcnt[9:6] : 4'b0;
-	// assign vblu = vis ? vcnt[9:6] : 4'b0;
-	
 	
 endmodule

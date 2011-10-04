@@ -85,41 +85,14 @@ module top
 
 
 sxga sxga  (
-    .clk   ( clk108	),
-	// .vred  ( vga_r 	),
-	// .vgrn  ( vga_g	),	
-	// .vblu  ( vga_b 	),
-	.haddr ( haddr   ),
-	.vaddr ( vaddr   ),
-	.hsync ( vga_hs	 ),
-	.vsync ( vga_vs	 ),
-	.vis   ( vga_vis )
+    .clk   ( clk108	 ),
+	.r     ( vga_r 	 ),
+	.g     ( vga_g	 ),	
+	.b     ( vga_b 	 ),
+	.hs    ( vga_hs	 ),
+	.vs    ( vga_vs	 )
 	);
 
-	wire [10:0] haddr;
-	wire [10:0] vaddr;
-	
-	assign sram_addr = {vaddr[8:0], haddr[8:0]};
-	assign vga_r = vga_vis && sw[9] ? sram_dq[15:12] : 4'b0;
-	assign vga_g = vga_vis && sw[8] ? sram_dq[10: 7] : 4'b0;
-	assign vga_b = vga_vis && sw[7] ? sram_dq[ 4: 1] : 4'b0;
-	assign sram_ce_n = 1'b0;
-	assign sram_oe_n = 1'b0;
-	assign sram_lb_n = 1'b0;
-	assign sram_ub_n = 1'b0;
-	assign sram_we_n = 1'b1;
-
-	
-	
-// sram sram (
-	// .dq   ( sram_dq   ),
-    // .addr ( sram_addr ),
-    // .ub_n ( sram_ub_n ),
-    // .lb_n ( sram_lb_n ),
-    // .we_n ( sram_we_n ),
-    // .ce_n ( sram_ce_n ),
-    // .oe_n ( sram_oe_n )
-	// );
 
 	assign ledr = sw;
 	assign ledg[3:0] = key;
