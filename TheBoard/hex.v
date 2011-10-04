@@ -1,9 +1,9 @@
 
 module hex	(
-input	        	clk,
-input	        	en,
-input	    [3:0]	val,
-input	    [1:0]	dig,
+input  wire        	clk,
+input  wire      	en,
+input  wire [3:0]	val,
+input  wire [1:0]	dig,
 output reg	[27:0]	seg
 );
 

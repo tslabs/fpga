@@ -2,87 +2,124 @@ module top
 (
 
 // Clocks
-	input	[1:0]	clock_24,				//	24 MHz
-	input	[1:0]	clock_27,				//	27 MHz
-	input			clock_50,				//	50 MHz
-	input			ext_clock,				//	External Clock
+	input  wire	[1:0]	clock_24,				//	24 MHz
+	input  wire	[1:0]	clock_27,				//	27 MHz
+	input  wire			clock_50,				//	50 MHz
+	input  wire			ext_clock,				//	External Clock
 // Push Button
-	input	[3:0]	key,					//	Pushbutton[3:0]
+	input  wire	[3:0]	key,					//	Pushbutton[3:0]
 // DPDT Switch
-	input	[9:0]	sw,						//	Toggle Switch[9:0]
+	input  wire	[9:0]	sw,						//	Toggle Switch[9:0]
 // 7-SEG Display
-	output	[6:0]	hex0,					//	Seven Segment Digit 0
-	output	[6:0]	hex1,					//	Seven Segment Digit 1
-	output	[6:0]	hex2,					//	Seven Segment Digit 2
-	output	[6:0]	hex3,					//	Seven Segment Digit 3
+	output wire	[6:0]	hex0,					//	Seven Segment Digit 0
+	output wire	[6:0]	hex1,					//	Seven Segment Digit 1
+	output wire	[6:0]	hex2,					//	Seven Segment Digit 2
+	output wire	[6:0]	hex3,					//	Seven Segment Digit 3
 // LED
-	output	[7:0]	ledg,					//	LED Green[7:0]
-	output	[9:0]	ledr,					//	LED Red[9:0]
+	output wire	[7:0]	ledg,					//	LED Green[7:0]
+	output wire	[9:0]	ledr,					//	LED Red[9:0]
 // UART
-	output			uart_txd,				//	UART Transmitter
-	input			uart_rxd,				//	UART Receiver
+	output wire			uart_txd,				//	UART Transmitter
+	input  wire			uart_rxd,				//	UART Receiver
 // SDRAM
-	inout	[15:0]	dram_dq,				//	SDRAM Data bus 16 Bits
-	output	[11:0]	dram_addr,				//	SDRAM Address bus 12 Bits
-	output			dram_ldqm,				//	SDRAM Low-byte Data Mask 
-	output			dram_udqm,				//	SDRAM High-byte Data Mask
-	output			dram_we_n,				//	SDRAM Write Enable
-	output			dram_cas_n,				//	SDRAM Column Address Strobe
-	output			dram_ras_n,				//	SDRAM Row Address Strobe
-	output			dram_cs_n,				//	SDRAM Chip Select
-	output			dram_ba_0,				//	SDRAM Bank Address 0
-	output			dram_ba_1,				//	SDRAM Bank Address 0
-	output			dram_clk,				//	SDRAM Clock
-	output			dram_cke,				//	SDRAM Clock Enable
+	inout  wire	[15:0]	dram_dq,				//	SDRAM Data bus 16 Bits
+	output wire	[11:0]	dram_addr,				//	SDRAM Address bus 12 Bits
+	output wire			dram_ldqm,				//	SDRAM Low-byte Data Mask 
+	output wire			dram_udqm,				//	SDRAM High-byte Data Mask
+	output wire			dram_we_n,				//	SDRAM Write Enable
+	output wire			dram_cas_n,				//	SDRAM Column Address Strobe
+	output wire			dram_ras_n,				//	SDRAM Row Address Strobe
+	output wire			dram_cs_n,				//	SDRAM Chip Select
+	output wire			dram_ba_0,				//	SDRAM Bank Address 0
+	output wire			dram_ba_1,				//	SDRAM Bank Address 0
+	output wire			dram_clk,				//	SDRAM Clock
+	output wire			dram_cke,				//	SDRAM Clock Enable
 // Flash
-	inout	[7:0]	fl_dq,					//	FLASH Data bus 8 Bits
-	output	[21:0]	fl_addr,				//	FLASH Address bus 22 Bits
-	output			fl_we_n,				//	FLASH Write Enable
-	output			fl_rst_n,				//	FLASH Reset
-	output			fl_oe_n,				//	FLASH Output Enable
-	output			fl_ce_n,				//	FLASH Chip Enable
+	inout  wire [7:0]	fl_dq,					//	FLASH Data bus 8 Bits
+	output wire [21:0]	fl_addr,				//	FLASH Address bus 22 Bits
+	output wire 		fl_we_n,				//	FLASH Write Enable
+	output wire 		fl_rst_n,				//	FLASH Reset
+	output wire 		fl_oe_n,				//	FLASH Output Enable
+	output wire 		fl_ce_n,				//	FLASH Chip Enable
 // SRAM
-	inout	[15:0]	sram_dq,				//	SRAM Data bus 16 Bits
-	output	[17:0]	sram_addr,				//	SRAM Address bus 18 Bits
-	output			sram_ub_n,				//	SRAM High-byte Data Mask 
-	output			sram_lb_n,				//	SRAM Low-byte Data Mask 
-	output			sram_we_n,				//	SRAM Write Enable
-	output			sram_ce_n,				//	SRAM Chip Enable
-	output			sram_oe_n,				//	SRAM Output Enable
+	inout  wire [15:0]	sram_dq,				//	SRAM Data bus 16 Bits
+	output wire [17:0]	sram_addr,				//	SRAM Address bus 18 Bits
+	output wire 		sram_ub_n,				//	SRAM High-byte Data Mask 
+	output wire 		sram_lb_n,				//	SRAM Low-byte Data Mask 
+	output wire 		sram_we_n,				//	SRAM Write Enable
+	output wire 		sram_ce_n,				//	SRAM Chip Enable
+	output wire 		sram_oe_n,				//	SRAM Output Enable
 // SD Card
-	output			sd_cs_n,	    		//	SD Card Chip Select
-	output			sd_clk,					//	SD Card Clock
-	output			sd_do,					//	SD Card Data Out
-	input			sd_di,					//	SD Card Data In
+	output wire		sd_cs_n,	    			//	SD Card Chip Select
+	output wire		sd_clk,						//	SD Card Clock
+	output wire		sd_do,						//	SD Card Data Out
+	input  wire		sd_di,						//	SD Card Data In
 // I2C
-	inout			i2c_sdat,				//	I2C Data
-	output			i2c_sclk,				//	I2C Clock
+	inout  wire			i2c_sdat,				//	I2C Data
+	output wire			i2c_sclk,				//	I2C Clock
 // PS/2
-	input		 	ps2_dat,				//	PS2 Data
-	input			ps2_clk,				//	PS2 Clock
+	inout  wire		 	ps2_dat,				//	PS2 Data
+	output wire			ps2_clk,				//	PS2 Clock
 // USB JTAG
-	input  			tdi,					// CPLD -> FPGA (data in)
-	input  			tck,					// CPLD -> FPGA (clk)
-	input  			tcs,					// CPLD -> FPGA (CS)
-	output 			tdo,					// FPGA -> CPLD (data out)
+	input  wire			tdi,					// CPLD -> FPGA (data in)
+	input  wire			tck,					// CPLD -> FPGA (clk)
+	input  wire			tcs,					// CPLD -> FPGA (CS)
+	output wire			tdo,					// FPGA -> CPLD (data out)
 // VGA
-	output			vga_hs,					//	VGA H_SYNC
-	output			vga_vs,					//	VGA V_SYNC
-	output	[3:0]	vga_r,   				//	VGA Red[3:0]
-	output	[3:0]	vga_g,	 				//	VGA Green[3:0]
-	output	[3:0]	vga_b,   				//	VGA Blue[3:0]
+	output wire			vga_hs,					//	VGA H_SYNC
+	output wire			vga_vs,					//	VGA V_SYNC
+	output wire	[3:0]	vga_r,   				//	VGA Red[3:0]
+	output wire	[3:0]	vga_g,	 				//	VGA Green[3:0]
+	output wire	[3:0]	vga_b,   				//	VGA Blue[3:0]
 // Audio CODEC
-	output			aud_adclrck,			//	Audio CODEC ADC LR Clock
-	input			aud_adcdat,				//	Audio CODEC ADC Data
-	output			aud_daclrck,			//	Audio CODEC DAC LR Clock
-	output			aud_dacdat,				//	Audio CODEC DAC Data
-	inout			aud_bclk,				//	Audio CODEC Bit-Stream Clock
-	output			aud_xck,				//	Audio CODEC Chip Clock
+	output wire			aud_adclrck,			//	Audio CODEC ADC LR Clock
+	input  wire			aud_adcdat,				//	Audio CODEC ADC Data
+	output wire			aud_daclrck,			//	Audio CODEC DAC LR Clock
+	output wire			aud_dacdat,				//	Audio CODEC DAC Data
+	output wire			aud_bclk,				//	Audio CODEC Bit-Stream Clock
+	output wire			aud_xck,				//	Audio CODEC Chip Clock
 // GPIO
-	inout	[35:0]	gpio_0,					//	GPIO Connection 0
-	inout	[35:0]	gpio_1					//	GPIO Connection 1
+	output wire	[35:0]	gpio_0,					//	GPIO Connection 0
+	output wire	[35:0]	gpio_1					//	GPIO Connection 1
 );
 
+
+sxga sxga  (
+    .clk   ( clk108	),
+	// .vred  ( vga_r 	),
+	// .vgrn  ( vga_g	),	
+	// .vblu  ( vga_b 	),
+	.haddr ( haddr   ),
+	.vaddr ( vaddr   ),
+	.hsync ( vga_hs	 ),
+	.vsync ( vga_vs	 ),
+	.vis   ( vga_vis )
+	);
+
+	wire [10:0] haddr;
+	wire [10:0] vaddr;
+	
+	assign sram_addr = {vaddr[8:0], haddr[8:0]};
+	assign vga_r = vga_vis && sw[9] ? sram_dq[15:12] : 4'b0;
+	assign vga_g = vga_vis && sw[8] ? sram_dq[10: 7] : 4'b0;
+	assign vga_b = vga_vis && sw[7] ? sram_dq[ 4: 1] : 4'b0;
+	assign sram_ce_n = 1'b0;
+	assign sram_oe_n = 1'b0;
+	assign sram_lb_n = 1'b0;
+	assign sram_ub_n = 1'b0;
+	assign sram_we_n = 1'b1;
+
+	
+	
+// sram sram (
+	// .dq   ( sram_dq   ),
+    // .addr ( sram_addr ),
+    // .ub_n ( sram_ub_n ),
+    // .lb_n ( sram_lb_n ),
+    // .we_n ( sram_we_n ),
+    // .ce_n ( sram_ce_n ),
+    // .oe_n ( sram_oe_n )
+	// );
 
 	assign ledr = sw;
 	assign ledg[3:0] = key;
@@ -100,9 +137,6 @@ hex hex	(
     );
 
 
-	wire clk108;
-	wire clk166;
-	
 	pll	pll (
 	.inclk0 ( clock_24[0] ),
 	.c0     ( clk108      ),
