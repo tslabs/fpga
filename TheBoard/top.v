@@ -79,18 +79,30 @@ module top
 	output wire			aud_bclk,				//	Audio CODEC Bit-Stream Clock
 	output wire			aud_xck,				//	Audio CODEC Chip Clock
 // GPIO
-	output wire	[35:0]	gpio_0,					//	GPIO Connection 0
-	output wire	[35:0]	gpio_1					//	GPIO Connection 1
+	inout wire [35:0]	gpio_0,
+	inout wire [35:0]	gpio_1
 );
 
 
+
 sxga sxga  (
-    .clk   ( clk108	 ),
-	.r     ( vga_r 	 ),
-	.g     ( vga_g	 ),	
-	.b     ( vga_b 	 ),
-	.hs    ( vga_hs	 ),
-	.vs    ( vga_vs	 )
+    .clk   ( clk108	   ),
+    .clk2  ( clk108_2  ),
+	.r     ( vga_r 	   ),
+	.g     ( vga_g	   ),	
+	.b     ( vga_b 	   ),
+	.hs    ( vga_hs	   ),
+	.vs    ( vga_vs	   ),
+	
+	.sram_dq    ( sram_dq   ),
+	.sram_addr  ( sram_addr ),
+	.sram_ce_n  ( sram_ce_n ),
+	.sram_oe_n  ( sram_oe_n ),
+	.sram_we_n  ( sram_we_n ),
+	.sram_ub_n  ( sram_ub_n ),
+	.sram_lb_n  ( sram_lb_n ),
+	
+	.sw		( sw )
 	);
 
 
@@ -110,10 +122,15 @@ hex hex	(
     );
 
 
+	wire clk108;
+	wire hclk;
+	wire clk108_2;
+	
 	pll	pll (
 	.inclk0 ( clock_24[0] ),
 	.c0     ( clk108      ),
-	.c1     ( clk166      )
+	.c1     ( hclk        ),
+	.c2     ( clk108_2    )
 	);
 
 
