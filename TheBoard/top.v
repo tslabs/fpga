@@ -102,7 +102,8 @@ sxga sxga  (
 	.sram_ub_n  ( sram_ub_n ),
 	.sram_lb_n  ( sram_lb_n ),
 	
-	.sw		( sw )
+	.sw		( sw ),
+	.key	( key )
 	);
 
 

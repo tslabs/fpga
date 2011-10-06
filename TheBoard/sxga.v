@@ -1,12 +1,12 @@
 module 	sxga(
 
-	input  wire	        	clk,
-	input  wire	        	clk2,
-	output reg	[3:0]		r,
-	output reg	[3:0]		g,
-	output reg	[3:0]		b,
-	output reg				hs,
-	output reg				vs,
+	input  wire	        clk,
+	input  wire	        clk2,
+	output reg	[3:0]	r,
+	output reg	[3:0]	g,
+	output reg	[3:0]	b,
+	output reg			hs,
+	output reg			vs,
 	
 	input  wire [15:0]	sram_dq,	
 	output reg  [17:0]	sram_addr,
@@ -16,7 +16,8 @@ module 	sxga(
 	output reg  		sram_lb_n,
 	output reg  		sram_ub_n,
 	
-	input  wire	[9:0]	sw
+	input  wire	[9:0]	sw,
+	input  wire	[3:0]	key
 );
 
 
@@ -24,82 +25,34 @@ module 	sxga(
 //	|....48.....|...112....|...248....|....1280.....|	hor
 //	|.....1.....|.....3....|....38....|....1024.....|	ver
 
-	localparam HFRONT   = 11'd0;
-	localparam HSYNC    = 11'd48;
-	localparam HBACK    = 11'd160;
-	localparam HVISIBLE = 11'd408;
-	localparam HTOTAL   = 11'd1688;
-
-	localparam VFRONT   = 11'd0;
-	localparam VSYNC    = 11'd1;
-	localparam VBACK    = 11'd4;
-	localparam VVISIBLE = 11'd42;
-    localparam VTOTAL   = 11'd1066;
-
-	
-	reg	[10:0]	hcnt;
-	reg	[10:0]	vcnt;
-	reg			vvis;           // vertical pixels window
-	reg			hfetch;         // window for fetching
-	reg			hf1, hf2;
-	
-	wire eol = (hcnt == (HTOTAL - 1));
-	wire hss = (hcnt == (HSYNC - 1));
-	wire hse = (hcnt == (HBACK - 1));
-	wire hfs = (hcnt == (HVISIBLE - 4));
-	wire hfe = (hcnt == (HTOTAL - 4));
-	
-	wire eof = (vcnt == (VTOTAL - 1));
-	wire vss = (vcnt == (VSYNC - 1));
-	wire vse = (vcnt == (VBACK - 1));
-	wire vvs = (vcnt == (VVISIBLE - 1));
-
-	wire [10:0] haddr = hcnt - HVISIBLE + 3;
-	wire [10:0] vaddr = vcnt - VVISIBLE;
-	wire [17:0] saddr = {vaddr[8:0], haddr[8:0]};
-
-
-// SRAM part
-	wire 		v_req = 1'b1;
-	// wire [15:0]	sram_d = v_req ? sram_dq : 16'b0;
-	wire [15:0]	sram_d = sram_dq;
-
-  	always @(posedge clk)
-	begin
-		if (hfetch)
-		begin
-			sram_addr <= saddr;
-			sram_ce_n <= ~v_req;
-			sram_oe_n <= ~v_req;
-			sram_we_n <= 1'b1;
-			sram_lb_n <= 1'b0;
-			sram_ub_n <= 1'b0;
-		end
+	localparam HSYNC    = 11'd48;		// start of Horizontal Sync
+	localparam HBACK    = 11'd160;		// start of Horizontal Back Porch
+	localparam HVISIBLE = 11'd408;		// start of Horizontal Pixels
+	localparam HTOTAL   = 11'd1688;		// total number of tacts per line
 		
-		else
-		begin
-			sram_ce_n <= 1'b1;
-			sram_oe_n <= 1'b1;
-			sram_we_n <= 1'b1;
-			sram_lb_n <= 1'b1;
-			sram_ub_n <= 1'b1;
-		end
-	end
+	localparam VSYNC    = 11'd1;		// start of Vertical Sync
+	localparam VBACK    = 11'd4;		// start of Vertical Back Porch
+	localparam VVISIBLE = 11'd42;		// start of Vertical Pixels
+    localparam VTOTAL   = 11'd1066;		// total number of line per frame
+
 	
 	
-// VGA part	
-    always @(posedge clk)
-    begin
-		hf1 <= hfetch;
-		hf2 <= hf1;
-				
-        r <= hf2 && sw[9] ? sram_d[15:12] : 4'b0;
-        g <= hf2 && sw[8] ? sram_d[10: 7] : 4'b0;
-        b <= hf2 && sw[7] ? sram_d[ 4: 1] : 4'b0;
-    end
-    
+	wire hss = (hcnt == (HSYNC - 1));            	// hsync start trigger
+	wire hse = (hcnt == (HBACK - 1));            	// hsync end trigger
+	wire hfs = (hcnt == (HVISIBLE - 4)) && vvis; 	// fetch start trigger
+	wire hfe = (hcnt == (HTOTAL - 4));           	// fetch end trigger
+	wire eol = (hcnt == (HTOTAL - 1));           	// end of line trigger
+	                                              
+	wire vss = (vcnt == (VSYNC - 1));             	// vsync start trigger
+	wire vse = (vcnt == (VBACK - 1));             	// vsync end trigger
+	wire vvs = (vcnt == (VVISIBLE - 1));          	// vertical pixels area start trigger
+	wire eof = (vcnt == (VTOTAL - 1));            	// end of frame trigger
+
 	
 // horizontal part
+	reg	[10:0]	hcnt;
+	reg			hfetch;         // window for fetching
+	
 	always @(posedge clk)
 	begin
 	
@@ -113,7 +66,7 @@ module 	sxga(
 		else if (hse)
 			hs <= 1'b1;
 
-		if (hfs && vvis)
+		if (hfs)
 			hfetch <= 1'b1;
 		else if (hfe)
 			hfetch <= 1'b0;
@@ -122,6 +75,9 @@ module 	sxga(
 
 
 // vertical part
+	reg	[10:0]	vcnt;
+	reg			vvis;           // vertical pixels window
+	
 	always @(posedge clk)
 	begin
 		if (eol)
@@ -142,6 +98,113 @@ module 	sxga(
 			else if (eof)
 				vvis <= 1'b0;
 
+		end
+	end
+
+
+// Bitmap walking
+	reg [10:0]	step_x = 11'b00010000000;		// These are 4.7 (4 bits for integer and 8 bits for fractal part)
+	reg [10:0]	step_y = 11'b00000000000;
+	reg [15:0]	bitmap_x;						// These are 9.7 (= 512x512 with 7 bits for fractal part)
+	reg [15:0]	bitmap_y;
+	reg [15:0]	bm_x_temp;
+	reg [15:0]	bm_y_temp;
+	
+	always @(posedge clk)
+	begin
+		
+		if (hfe && eof)								// at the last tact of frame
+		begin
+			bm_x_temp <= 0;							// initiate start X and Y for bitmap
+			bm_y_temp <= 0;
+		end
+		
+		else
+		if (hfs)									// at the start of visible line
+		begin
+			bitmap_x <= bm_x_temp;					// get new X and Y for bitmap
+			bitmap_y <= bm_y_temp;
+
+			bm_x_temp <= bm_x_temp - step_y;		// move to next line of bitmap
+			bm_y_temp <= bm_y_temp + step_x;
+		end
+		
+		else
+		if (hfetch)									// at the visible area of line
+		begin
+			bitmap_x <= bitmap_x + step_x;			// move to the next pixel of bitmap
+			bitmap_y <= bitmap_y + step_y;
+		end
+		
+	end
+	
+		
+// SRAM part
+	wire [15:0]	sram_d = sram_dq;
+	wire [17:0] saddr = {bitmap_y[15:7], bitmap_x[15:7]};
+	wire 		v_req = hfetch;
+	wire		s_req = v_req;
+	wire		r_req = v_req;
+	wire		w_req = 1'b0;
+	wire [ 1:0] b_req = 2'b11;
+
+  	always @(posedge clk)
+	begin
+		sram_addr <= saddr;
+		sram_ce_n <= ~s_req;
+		sram_oe_n <= ~r_req;
+		sram_we_n <= ~w_req;
+		sram_lb_n <= ~b_req[0];
+		sram_ub_n <= ~b_req[1];
+	end
+	
+	
+// VGA-out part	
+	reg	[1:0] hf_delayed;
+
+    always @(posedge clk)
+    begin
+		hf_delayed[0] <= hfetch;
+		hf_delayed[1] <= hf_delayed[0];
+				
+        r <= hf_delayed[1] && sw[9] ? sram_d[15:12] : 4'b0;
+        g <= hf_delayed[1] && sw[8] ? sram_d[10: 7] : 4'b0;
+        b <= hf_delayed[1] && sw[7] ? sram_d[ 4: 1] : 4'b0;
+    end
+    
+	
+// Zooming and Rotating control
+	always @(posedge clk)
+	begin
+		if (eol && eof)
+		begin
+	
+			if (!key[0])
+			begin
+				step_x <= step_x - 1;
+				// step_y <= step_y + 1;
+			end
+	
+			else
+			if (!key[1])
+			begin
+				step_x <= step_x + 1;
+				// step_y <= step_y - 1;
+			end
+			
+			if (!key[2])
+			begin
+				// step_x <= step_x - 1;
+				step_y <= step_y - 1;
+			end
+	
+			else
+			if (!key[3])
+			begin
+				// step_x <= step_x + 1;
+				step_y <= step_y + 1;
+			end
+			
 		end
 	end
 
