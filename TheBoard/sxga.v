@@ -103,12 +103,12 @@ module 	sxga(
 
 
 // Bitmap walking
-	reg [10:0]	step_x = 11'b00010000000;		// These are 4.7 (4 bits for integer and 8 bits for fractal part)
-	reg [10:0]	step_y = 11'b00000000000;
-	reg [15:0]	bitmap_x;						// These are 9.7 (= 512x512 with 7 bits for fractal part)
-	reg [15:0]	bitmap_y;
-	reg [15:0]	bm_x_temp;
-	reg [15:0]	bm_y_temp;
+	reg [11:0]	step_x = 12'b000100000000;		// These are 4.8 (4 bits for integer and 8 bits for fractal part)
+	reg [11:0]	step_y = 12'b000000000000;
+	reg [16:0]	bitmap_x;						// These are 9.8 (= 512x512 with 8 bits for fractal part)
+	reg [16:0]	bitmap_y;
+	reg [16:0]	bm_x_temp;
+	reg [16:0]	bm_y_temp;
 	
 	always @(posedge clk)
 	begin
@@ -141,7 +141,7 @@ module 	sxga(
 		
 // SRAM part
 	wire [15:0]	sram_d = sram_dq;
-	wire [17:0] saddr = {bitmap_y[15:7], bitmap_x[15:7]};
+	wire [17:0] saddr = {bitmap_y[16:8], bitmap_x[16:8]};
 	wire 		v_req = hfetch;
 	wire		s_req = v_req;
 	wire		r_req = v_req;
