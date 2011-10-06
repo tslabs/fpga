@@ -103,12 +103,14 @@ module 	sxga(
 
 
 // Bitmap walking
-	reg [11:0]	step_x = 12'b000100000000;		// These are 4.8 (4 bits for integer and 8 bits for fractal part)
-	reg [11:0]	step_y = 12'b000000000000;
-	reg [16:0]	bitmap_x;						// These are 9.8 (= 512x512 with 8 bits for fractal part)
-	reg [16:0]	bitmap_y;
-	reg [16:0]	bm_x_temp;
-	reg [16:0]	bm_y_temp;
+	reg  [11:0]	step_x = 12'b000100000000;		// These are 4.8 (4 bits for integer and 8 bits for fractal part)
+	reg  [11:0]	step_y = 12'b000000000000;
+	reg  [16:0]	bitmap_x;						// These are 9.8 (= 512x512 with 8 bits for fractal part)
+	reg  [16:0]	bitmap_y;
+	reg  [16:0]	bm_x_temp;
+	reg  [16:0]	bm_y_temp;
+	wire [16:0] step_x_ext = {{6{step_x[11]}}, step_x[10:0]};
+	wire [16:0] step_y_ext = {{6{step_y[11]}}, step_y[10:0]};
 	
 	always @(posedge clk)
 	begin
@@ -125,15 +127,15 @@ module 	sxga(
 			bitmap_x <= bm_x_temp;					// get new X and Y for bitmap
 			bitmap_y <= bm_y_temp;
 
-			bm_x_temp <= bm_x_temp - step_y;		// move to next line of bitmap
-			bm_y_temp <= bm_y_temp + step_x;
+			bm_x_temp <= bm_x_temp - step_y_ext;		// move to next line of bitmap
+			bm_y_temp <= bm_y_temp + step_x_ext;
 		end
 		
 		else
 		if (hfetch)									// at the visible area of line
 		begin
-			bitmap_x <= bitmap_x + step_x;			// move to the next pixel of bitmap
-			bitmap_y <= bitmap_y + step_y;
+			bitmap_x <= bitmap_x + step_x_ext;			// move to the next pixel of bitmap
+			bitmap_y <= bitmap_y + step_y_ext;
 		end
 		
 	end
