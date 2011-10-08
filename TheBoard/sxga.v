@@ -103,11 +103,11 @@ module 	sxga(
 
 
 // Bitmap walking
-	reg  [20:0]	bitmap_x;							// These are 9.12 (= 512x512 with 8 bits for fractal part)
+	reg  [20:0]	bitmap_x;							// These are 9.12 (= 512x512 with 12 bits for fractal part)
 	reg  [20:0]	bitmap_y;
 	reg  [20:0]	bm_x_temp;
 	reg  [20:0]	bm_y_temp;
-	reg  [15:0]	step_x = 16'b0001000000000000;		// These are 4.12 (4 bits for integer and 8 bits for fractal part)
+	reg  [15:0]	step_x = 16'b0001000000000000;		// These are 4.12 (4 bits for integer and 12 bits for fractal part)
 	reg  [15:0]	step_y = 16'b0000000000000000;
 	wire [20:0] step_x_ext = {{6{step_x[15]}}, step_x[14:0]};
 	wire [20:0] step_y_ext = {{6{step_y[15]}}, step_y[14:0]};
