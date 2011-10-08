@@ -57,19 +57,19 @@ module 	sxga(
 	begin
 	
 		if (eol)
-			hcnt <= 11'd0;
+			hcnt <= 0;
 		else
-			hcnt <= hcnt + 11'd1;
+			hcnt <= hcnt + 1;
 			
 		if (hss)
-			hs <= 1'b0;
+			hs <= 0;
 		else if (hse)
-			hs <= 1'b1;
+			hs <= 1;
 
 		if (hfs)
-			hfetch <= 1'b1;
+			hfetch <= 1;
 		else if (hfe)
-			hfetch <= 1'b0;
+			hfetch <= 0;
         
 	end
 
@@ -84,33 +84,33 @@ module 	sxga(
 		begin
 		
 			if (eof)
-				vcnt <= 11'd0;
+				vcnt <= 0;
 			else
-				vcnt <= vcnt + 11'd1;
+				vcnt <= vcnt + 1;
 				
 			if (vss)
-				vs <= 1'b0;
+				vs <= 0;
 			else if (vse)
-				vs <= 1'b1;
+				vs <= 1;
 		
 			if (vvs)
-				vvis <= 1'b1;
+				vvis <= 1;
 			else if (eof)
-				vvis <= 1'b0;
+				vvis <= 0;
 
 		end
 	end
 
 
 // Bitmap walking
-	reg  [11:0]	step_x = 12'b000100000000;		// These are 4.8 (4 bits for integer and 8 bits for fractal part)
-	reg  [11:0]	step_y = 12'b000000000000;
-	reg  [16:0]	bitmap_x;						// These are 9.8 (= 512x512 with 8 bits for fractal part)
-	reg  [16:0]	bitmap_y;
-	reg  [16:0]	bm_x_temp;
-	reg  [16:0]	bm_y_temp;
-	wire [16:0] step_x_ext = {{6{step_x[11]}}, step_x[10:0]};
-	wire [16:0] step_y_ext = {{6{step_y[11]}}, step_y[10:0]};
+	reg  [20:0]	bitmap_x;							// These are 9.12 (= 512x512 with 8 bits for fractal part)
+	reg  [20:0]	bitmap_y;
+	reg  [20:0]	bm_x_temp;
+	reg  [20:0]	bm_y_temp;
+	reg  [15:0]	step_x = 16'b0001000000000000;		// These are 4.12 (4 bits for integer and 8 bits for fractal part)
+	reg  [15:0]	step_y = 16'b0000000000000000;
+	wire [20:0] step_x_ext = {{6{step_x[15]}}, step_x[14:0]};
+	wire [20:0] step_y_ext = {{6{step_y[15]}}, step_y[14:0]};
 	
 	always @(posedge clk)
 	begin
@@ -143,11 +143,11 @@ module 	sxga(
 		
 // SRAM part
 	wire [15:0]	sram_d = sram_dq;
-	wire [17:0] saddr = {bitmap_y[16:8], bitmap_x[16:8]};
+	wire [17:0] saddr = {bitmap_y[20:12], bitmap_x[20:12]};
 	wire 		v_req = hfetch;
 	wire		s_req = v_req;
 	wire		r_req = v_req;
-	wire		w_req = 1'b0;
+	wire		w_req = 0;
 	wire [ 1:0] b_req = 2'b11;
 
   	always @(posedge clk)
@@ -169,9 +169,9 @@ module 	sxga(
 		hf_delayed[0] <= hfetch;
 		hf_delayed[1] <= hf_delayed[0];
 				
-        r <= hf_delayed[1] && sw[9] ? sram_d[15:12] : 4'b0;
-        g <= hf_delayed[1] && sw[8] ? sram_d[10: 7] : 4'b0;
-        b <= hf_delayed[1] && sw[7] ? sram_d[ 4: 1] : 4'b0;
+        r <= hf_delayed[1] && sw[9] ? sram_d[15:12] : 0;
+        g <= hf_delayed[1] && sw[8] ? sram_d[10: 7] : 0;
+        b <= hf_delayed[1] && sw[7] ? sram_d[ 4: 1] : 0;
     end
     
 	
@@ -184,26 +184,22 @@ module 	sxga(
 			if (!key[0])
 			begin
 				step_x <= step_x - 1;
-				// step_y <= step_y + 1;
 			end
 	
 			else
 			if (!key[1])
 			begin
 				step_x <= step_x + 1;
-				// step_y <= step_y - 1;
 			end
 			
 			if (!key[2])
 			begin
-				// step_x <= step_x - 1;
 				step_y <= step_y - 1;
 			end
 	
 			else
 			if (!key[3])
 			begin
-				// step_x <= step_x + 1;
 				step_y <= step_y + 1;
 			end
 			
