@@ -84,7 +84,23 @@ module top
 );
 
 
+	// assign gpio_0 = 36'hZZZZZZZZZ;
+	// assign gpio_1 = 36'hZZZZZZZZZ;
+	assign ledr = {gpio_1[34], gpio_1[32], gpio_1[30], gpio_1[28], gpio_1[16], gpio_1[14], gpio_1[12], gpio_1[10], gpio_1[22], gpio_1[24]};
 
+	
+avr_port avr_port (
+	.clk	   ( clk108	    ),
+	.data	   ( {gpio_1[34], gpio_1[32], gpio_1[30], gpio_1[28], gpio_1[16], gpio_1[14], gpio_1[12], gpio_1[10]} ),
+	.ce_n 	   ( gpio_1[22] ),
+	.re_n 	   ( gpio_1[24] ),
+	.we_n 	   ( gpio_1[ 4] ),
+	.ae_p 	   ( gpio_1[ 6] ),
+	.de_p 	   ( gpio_1[ 8] ),
+	.r_n_b	   ( gpio_1[26] )
+	);
+
+	
 sxga sxga  (
     .clk   ( clk108	   ),
     .clk2  ( clk108_2  ),
@@ -107,7 +123,7 @@ sxga sxga  (
 	);
 
 
-	assign ledr = sw;
+	// assign ledr = sw;
 	assign ledg[3:0] = key;
 
 	wire        hex_en  = 1;
