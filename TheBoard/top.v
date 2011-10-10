@@ -84,24 +84,39 @@ module top
 );
 
 
-	// assign gpio_0 = 36'hZZZZZZZZZ;
-	// assign gpio_1 = 36'hZZZZZZZZZ;
 	assign ledr = {gpio_1[34], gpio_1[32], gpio_1[30], gpio_1[28], gpio_1[16], gpio_1[14], gpio_1[12], gpio_1[10], gpio_1[22], gpio_1[24]};
 
 	
-avr_port avr_port (
-	.clk	   ( clk108	    ),
-	.data	   ( {gpio_1[34], gpio_1[32], gpio_1[30], gpio_1[28], gpio_1[16], gpio_1[14], gpio_1[12], gpio_1[10]} ),
-	.ce_n 	   ( gpio_1[22] ),
-	.re_n 	   ( gpio_1[24] ),
-	.we_n 	   ( gpio_1[ 4] ),
-	.ae_p 	   ( gpio_1[ 6] ),
-	.de_p 	   ( gpio_1[ 8] ),
-	.r_n_b	   ( gpio_1[26] )
+	wire [23:0]	ap_addr;
+	wire [15:0]	ap_d_wr;
+	wire [15:0]	ap_d_rd = sram_dq;
+    wire		ap_w_rq;
+	wire		ap_r_rq;
+	wire		sram_rq_ack;
+	
+
+// These are ALE, CLE from DAP - if not tri-stated AVR is hanging
+	assign gpio_1[6] = 1'bZ;
+	assign gpio_1[8] = 1'bZ;
+	
+avr_dap avr_dap(
+	.clk		   ( clk108	    ),
+	.dap_data	   ( {gpio_1[34], gpio_1[32], gpio_1[30], gpio_1[28], gpio_1[16], gpio_1[14], gpio_1[12], gpio_1[10]} ),
+	.dap_ce_n 	   ( gpio_1[22] ),
+	.dap_re_n 	   ( gpio_1[24] ),
+	.dap_we_n 	   ( gpio_1[ 4] ),
+	.dap_r_n_b	   ( gpio_1[26] ),
+	
+	.addr		   ( ap_addr	),
+	.d_wr	       ( ap_d_wr	),
+	.d_rd	       ( ap_d_rd	),
+	.w_rq	       ( ap_w_rq	),
+	.r_rq	       ( ap_r_rq	),
+	.rq_ack        ( 1'b1		)
 	);
 
 	
-sxga sxga  (
+sxga sxga(
     .clk   ( clk108	   ),
     .clk2  ( clk108_2  ),
 	.r     ( vga_r 	   ),
@@ -130,7 +145,7 @@ sxga sxga  (
 	wire [3:0]  hex_val = sw[3:0];
 	wire [1:0]  hex_dig = sw[9:8];
 
-hex hex	(
+hex hex(
     .clk     ( clk108  ),
     .en      ( hex_en  ),
     .val     ( hex_val ),
@@ -143,7 +158,7 @@ hex hex	(
 	wire hclk;
 	wire clk108_2;
 	
-	pll	pll (
+	pll	pll(
 	.inclk0 ( clock_24[0] ),
 	.c0     ( clk108      ),
 	.c1     ( hclk        ),

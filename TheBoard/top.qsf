@@ -487,56 +487,147 @@ set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_clk -to "pll:p
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_NODE_INFO=805334529" -section_id avr_tap
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_POWER_UP_TRIGGER=0" -section_id avr_tap
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_STORAGE_QUALIFIER_INVERSION_MASK_LENGTH=0" -section_id avr_tap
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_SEGMENT_SIZE=8192" -section_id avr_tap
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_ATTRIBUTE_MEM_MODE=OFF" -section_id avr_tap
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_STATE_FLOW_USE_GENERATED=0" -section_id avr_tap
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_STATE_BITS=11" -section_id avr_tap
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_BUFFER_FULL_STOP=1" -section_id avr_tap
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_CURRENT_RESOURCE_WIDTH=1" -section_id avr_tap
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_LEVEL=1" -section_id avr_tap
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_SAMPLE_DEPTH=8192" -section_id avr_tap
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_IN_ENABLED=0" -section_id avr_tap
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_ADVANCED_TRIGGER_ENTITY=basic,1," -section_id avr_tap
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_LEVEL_PIPELINE=1" -section_id avr_tap
 set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_ENABLE_ADVANCED_TRIGGER=0" -section_id avr_tap
-set_global_assignment -name VERILOG_FILE avr_port.v
-set_global_assignment -name SIGNALTAP_FILE top.stp
+set_global_assignment -name PCI_IO OFF
 set_global_assignment -name VERILOG_FILE top.v
 set_global_assignment -name VERILOG_FILE sxga.v
+set_global_assignment -name VERILOG_FILE avr_dap.v
 set_global_assignment -name VERILOG_FILE hex.v
 set_global_assignment -name VERILOG_FILE pll.v
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_DATA_BITS=14" -section_id avr_tap
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_BITS=14" -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[0] -to gpio_1[10] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[1] -to gpio_1[12] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[2] -to gpio_1[14] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[3] -to gpio_1[16] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[4] -to gpio_1[22] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[5] -to gpio_1[24] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[6] -to gpio_1[26] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[7] -to gpio_1[28] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[8] -to gpio_1[30] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[9] -to gpio_1[32] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[10] -to gpio_1[34] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[11] -to gpio_1[4] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[12] -to gpio_1[6] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[13] -to gpio_1[8] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[0] -to gpio_1[10] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[1] -to gpio_1[12] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[2] -to gpio_1[14] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[3] -to gpio_1[16] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[4] -to gpio_1[22] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[5] -to gpio_1[24] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[6] -to gpio_1[26] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[7] -to gpio_1[28] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[8] -to gpio_1[30] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[9] -to gpio_1[32] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[10] -to gpio_1[34] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[11] -to gpio_1[4] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[12] -to gpio_1[6] -section_id avr_tap
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[13] -to gpio_1[8] -section_id avr_tap
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_NODE_CRC_LOWORD=32274" -section_id avr_tap
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_INVERSION_MASK=000000000000000000000000000000000000000000000000000000000000000000000" -section_id avr_tap
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_INVERSION_MASK_LENGTH=69" -section_id avr_tap
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_NODE_CRC_HIWORD=22531" -section_id avr_tap
+set_global_assignment -name SIGNALTAP_FILE top.stp
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[0] -to "avr_dap:avr_dap|addr[0]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[1] -to "avr_dap:avr_dap|addr[10]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[2] -to "avr_dap:avr_dap|addr[11]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[3] -to "avr_dap:avr_dap|addr[12]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[4] -to "avr_dap:avr_dap|addr[13]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[5] -to "avr_dap:avr_dap|addr[14]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[6] -to "avr_dap:avr_dap|addr[15]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[7] -to "avr_dap:avr_dap|addr[16]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[8] -to "avr_dap:avr_dap|addr[17]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[9] -to "avr_dap:avr_dap|addr[18]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[10] -to "avr_dap:avr_dap|addr[19]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[11] -to "avr_dap:avr_dap|addr[1]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[12] -to "avr_dap:avr_dap|addr[20]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[13] -to "avr_dap:avr_dap|addr[21]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[14] -to "avr_dap:avr_dap|addr[22]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[15] -to "avr_dap:avr_dap|addr[23]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[16] -to "avr_dap:avr_dap|addr[2]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[17] -to "avr_dap:avr_dap|addr[3]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[18] -to "avr_dap:avr_dap|addr[4]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[19] -to "avr_dap:avr_dap|addr[5]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[20] -to "avr_dap:avr_dap|addr[6]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[21] -to "avr_dap:avr_dap|addr[7]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[22] -to "avr_dap:avr_dap|addr[8]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[23] -to "avr_dap:avr_dap|addr[9]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[24] -to "avr_dap:avr_dap|ce" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[25] -to "avr_dap:avr_dap|dap_data[0]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[26] -to "avr_dap:avr_dap|dap_data[1]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[27] -to "avr_dap:avr_dap|dap_data[2]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[28] -to "avr_dap:avr_dap|dap_data[3]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[29] -to "avr_dap:avr_dap|dap_data[4]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[30] -to "avr_dap:avr_dap|dap_data[5]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[31] -to "avr_dap:avr_dap|dap_data[6]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[32] -to "avr_dap:avr_dap|dap_data[7]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[33] -to "avr_dap:avr_dap|dap_re_n" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[34] -to "avr_dap:avr_dap|ms.MS_AW1" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[35] -to "avr_dap:avr_dap|ms.MS_AW2" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[36] -to "avr_dap:avr_dap|ms.MS_AW3" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[37] -to "avr_dap:avr_dap|ms.MS_AW4" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[38] -to "avr_dap:avr_dap|ms.MS_AW5" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[39] -to "avr_dap:avr_dap|ms.MS_AW6" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[40] -to "avr_dap:avr_dap|ms.MS_AW7" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[41] -to "avr_dap:avr_dap|ms.MS_AW8" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[42] -to "avr_dap:avr_dap|ms.MS_DR1" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[43] -to "avr_dap:avr_dap|ms.MS_DR2" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[44] -to "avr_dap:avr_dap|ms.MS_DR3" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[45] -to "avr_dap:avr_dap|ms.MS_DR4" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[46] -to "avr_dap:avr_dap|ms.MS_DR5" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[47] -to "avr_dap:avr_dap|ms.MS_DW1" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[48] -to "avr_dap:avr_dap|ms.MS_DW2" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[49] -to "avr_dap:avr_dap|ms.MS_DW3" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[50] -to "avr_dap:avr_dap|ms.MS_DW4" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[51] -to "avr_dap:avr_dap|ms.MS_DW5" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[52] -to "avr_dap:avr_dap|ms.MS_DW6" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[53] -to "avr_dap:avr_dap|ms.MS_FRK" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[54] -to "avr_dap:avr_dap|ms.MS_IDL" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[55] -to "avr_dap:avr_dap|r_rq" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[56] -to "avr_dap:avr_dap|re" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[57] -to "avr_dap:avr_dap|w_rq" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[58] -to "avr_dap:avr_dap|we" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[0] -to "avr_dap:avr_dap|addr[0]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[1] -to "avr_dap:avr_dap|addr[10]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[2] -to "avr_dap:avr_dap|addr[11]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[3] -to "avr_dap:avr_dap|addr[12]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[4] -to "avr_dap:avr_dap|addr[13]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[5] -to "avr_dap:avr_dap|addr[14]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[6] -to "avr_dap:avr_dap|addr[15]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[7] -to "avr_dap:avr_dap|addr[16]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[8] -to "avr_dap:avr_dap|addr[17]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[9] -to "avr_dap:avr_dap|addr[18]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[10] -to "avr_dap:avr_dap|addr[19]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[11] -to "avr_dap:avr_dap|addr[1]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[12] -to "avr_dap:avr_dap|addr[20]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[13] -to "avr_dap:avr_dap|addr[21]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[14] -to "avr_dap:avr_dap|addr[22]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[15] -to "avr_dap:avr_dap|addr[23]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[16] -to "avr_dap:avr_dap|addr[2]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[17] -to "avr_dap:avr_dap|addr[3]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[18] -to "avr_dap:avr_dap|addr[4]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[19] -to "avr_dap:avr_dap|addr[5]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[20] -to "avr_dap:avr_dap|addr[6]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[21] -to "avr_dap:avr_dap|addr[7]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[22] -to "avr_dap:avr_dap|addr[8]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[23] -to "avr_dap:avr_dap|addr[9]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[24] -to "avr_dap:avr_dap|ce" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[25] -to "avr_dap:avr_dap|dap_data[0]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[26] -to "avr_dap:avr_dap|dap_data[1]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[27] -to "avr_dap:avr_dap|dap_data[2]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[28] -to "avr_dap:avr_dap|dap_data[3]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[29] -to "avr_dap:avr_dap|dap_data[4]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[30] -to "avr_dap:avr_dap|dap_data[5]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[31] -to "avr_dap:avr_dap|dap_data[6]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[32] -to "avr_dap:avr_dap|dap_data[7]" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[33] -to "avr_dap:avr_dap|dap_re_n" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[34] -to "avr_dap:avr_dap|ms.MS_AW1" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[35] -to "avr_dap:avr_dap|ms.MS_AW2" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[36] -to "avr_dap:avr_dap|ms.MS_AW3" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[37] -to "avr_dap:avr_dap|ms.MS_AW4" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[38] -to "avr_dap:avr_dap|ms.MS_AW5" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[39] -to "avr_dap:avr_dap|ms.MS_AW6" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[40] -to "avr_dap:avr_dap|ms.MS_AW7" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[41] -to "avr_dap:avr_dap|ms.MS_AW8" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[42] -to "avr_dap:avr_dap|ms.MS_DR1" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[43] -to "avr_dap:avr_dap|ms.MS_DR2" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[44] -to "avr_dap:avr_dap|ms.MS_DR3" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[45] -to "avr_dap:avr_dap|ms.MS_DR4" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[46] -to "avr_dap:avr_dap|ms.MS_DR5" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[47] -to "avr_dap:avr_dap|ms.MS_DW1" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[48] -to "avr_dap:avr_dap|ms.MS_DW2" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[49] -to "avr_dap:avr_dap|ms.MS_DW3" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[50] -to "avr_dap:avr_dap|ms.MS_DW4" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[51] -to "avr_dap:avr_dap|ms.MS_DW5" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[52] -to "avr_dap:avr_dap|ms.MS_DW6" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[53] -to "avr_dap:avr_dap|ms.MS_FRK" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[54] -to "avr_dap:avr_dap|ms.MS_IDL" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[55] -to "avr_dap:avr_dap|r_rq" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[56] -to "avr_dap:avr_dap|re" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[57] -to "avr_dap:avr_dap|w_rq" -section_id avr_tap
+set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[58] -to "avr_dap:avr_dap|we" -section_id avr_tap
+set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_DATA_BITS=59" -section_id avr_tap
+set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_BITS=59" -section_id avr_tap
+set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_INVERSION_MASK=0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" -section_id avr_tap
+set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_INVERSION_MASK_LENGTH=202" -section_id avr_tap
+set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_SEGMENT_SIZE=2048" -section_id avr_tap
+set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_NODE_CRC_LOWORD=14273" -section_id avr_tap
+set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_NODE_CRC_HIWORD=33865" -section_id avr_tap
+set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_SAMPLE_DEPTH=2048" -section_id avr_tap
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
