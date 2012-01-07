@@ -533,7 +533,6 @@ set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_COLOR 2147039 -section_id Top
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
-set_global_assignment -name MISC_FILE "D:/altera/qdesigns/esemsx3.503/emsx_top.dpf"
 set_global_assignment -name VHDL_FILE src/emsx_top.vhd
 set_global_assignment -name VHDL_FILE src/sound/lpf/lpf.vhd
 set_global_assignment -name VHDL_FILE src/sound/lpf/lpf48.vhd
@@ -605,4 +604,3 @@ set_global_assignment -name VERILOG_FILE src/de1/A_CODEC.V
 set_global_assignment -name VERILOG_FILE src/de1/SEG7_LUT_4.v
 set_global_assignment -name VERILOG_FILE src/de1/SEG7_LUT.v
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS INPUT TRI-STATED"
-set_global_assignment -name MISC_FILE "D:/ALTERA/ESEMSX3.513/emsx_top.dpf"
