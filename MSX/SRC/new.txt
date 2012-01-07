@@ -1,0 +1,20 @@
+Обновленный релиз OCM на DE1 от 27.08.10
+----------------------------------------
+
+1) Использовано новое ядро T80 с исправлениями TobiFlex;
+(реализованы недокументированные команды с префиксом 0DDh 0CBh).
+2) Загрузка ROMS на максимальной скорости не зависимо от
+положения переключателя выбора частоты процессора Dip(7);
+3) Изменено назначение переключателей Dip(0)..Dip(9);
+
+Updated relize OCM on DE1 from 27.08.10
+ ---------------------------------------- 
+
+1) The new core T80 with corrections TobiFlex is used;
+( The not documentary commands  with prefix  0DDh 0CBh are realized.
+2) Loading ROMS on maximal speed is not dependent from sets of the switch 
+of a choice of frequency of the processor Dip (7);
+3) The assignment of switches Dip(0)...Dip(9)  is changed.
+
+caro
+
