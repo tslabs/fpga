@@ -1,7 +1,0 @@
-You need to find the ROMs yourself and concatenate them into a single file which then
-needs to be programmed into the DE1's flash.  The ROMs need to be in the following order:
-
-- MOS
-- BASIC
-- DFS or SUPERMMC (MMBEEB)
-

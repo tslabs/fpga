@@ -1,1 +1,0 @@
-nova_spec.doc:specifications of nova design
