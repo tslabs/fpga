@@ -7,9 +7,9 @@ module rnd_vec_gen(
 	out
 );
 
-parameter OUT_SIZE = 16; // size of output port, independent of LFSR register size
+parameter OUT_SIZE = 75; // size of output port, independent of LFSR register size
 
-parameter LFSR_LENGTH   = 280; // LFSR
+parameter LFSR_LENGTH   = 60; // LFSR
 parameter LFSR_FEEDBACK = 24; //     definition
 
 

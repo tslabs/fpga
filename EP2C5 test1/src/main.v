@@ -5,7 +5,7 @@ module main
 	output wire pin7,
 	output wire pin9,
 
-	output wire [15:0] rnd_out
+	output wire [74:0] rnd_out
 );
 
 	wire [25:0] cnt0 = {cnt[25:18], cnt[17:0]};
