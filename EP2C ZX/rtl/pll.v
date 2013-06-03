@@ -103,9 +103,9 @@ module pll (
 		altpll_component.clk1_duty_cycle = 50,
 		altpll_component.clk1_multiply_by = 9,
 		altpll_component.clk1_phase_shift = "0",
-		altpll_component.clk2_divide_by = 1,
+		altpll_component.clk2_divide_by = 5,
 		altpll_component.clk2_duty_cycle = 50,
-		altpll_component.clk2_multiply_by = 1,
+		altpll_component.clk2_multiply_by = 18,
 		altpll_component.clk2_phase_shift = "0",
 		altpll_component.compensate_clock = "CLK0",
 		altpll_component.inclk0_input_frequency = 20000,
@@ -178,7 +178,7 @@ endmodule
 // Retrieval info: PRIVATE: CUR_DEDICATED_CLK STRING "c0"
 // Retrieval info: PRIVATE: CUR_FBIN_CLK STRING "c0"
 // Retrieval info: PRIVATE: DEVICE_SPEED_GRADE STRING "8"
-// Retrieval info: PRIVATE: DIV_FACTOR0 NUMERIC "12"
+// Retrieval info: PRIVATE: DIV_FACTOR0 NUMERIC "15"
 // Retrieval info: PRIVATE: DIV_FACTOR1 NUMERIC "1"
 // Retrieval info: PRIVATE: DIV_FACTOR2 NUMERIC "1"
 // Retrieval info: PRIVATE: DUTY_CYCLE0 STRING "50.00000000"
@@ -210,13 +210,13 @@ endmodule
 // Retrieval info: PRIVATE: MIRROR_CLK0 STRING "0"
 // Retrieval info: PRIVATE: MIRROR_CLK1 STRING "0"
 // Retrieval info: PRIVATE: MIRROR_CLK2 STRING "0"
-// Retrieval info: PRIVATE: MULT_FACTOR0 NUMERIC "26"
+// Retrieval info: PRIVATE: MULT_FACTOR0 NUMERIC "3"
 // Retrieval info: PRIVATE: MULT_FACTOR1 NUMERIC "1"
 // Retrieval info: PRIVATE: MULT_FACTOR2 NUMERIC "1"
 // Retrieval info: PRIVATE: NORMAL_MODE_RADIO STRING "1"
 // Retrieval info: PRIVATE: OUTPUT_FREQ0 STRING "30.00000000"
 // Retrieval info: PRIVATE: OUTPUT_FREQ1 STRING "90.00000000"
-// Retrieval info: PRIVATE: OUTPUT_FREQ2 STRING "50.00000000"
+// Retrieval info: PRIVATE: OUTPUT_FREQ2 STRING "180.00000000"
 // Retrieval info: PRIVATE: OUTPUT_FREQ_MODE0 STRING "1"
 // Retrieval info: PRIVATE: OUTPUT_FREQ_MODE1 STRING "1"
 // Retrieval info: PRIVATE: OUTPUT_FREQ_MODE2 STRING "1"
@@ -230,8 +230,8 @@ endmodule
 // Retrieval info: PRIVATE: PHASE_SHIFT2 STRING "0.00000000"
 // Retrieval info: PRIVATE: PHASE_SHIFT_STEP_ENABLED_CHECK STRING "0"
 // Retrieval info: PRIVATE: PHASE_SHIFT_UNIT0 STRING "deg"
-// Retrieval info: PRIVATE: PHASE_SHIFT_UNIT1 STRING "ps"
-// Retrieval info: PRIVATE: PHASE_SHIFT_UNIT2 STRING "ps"
+// Retrieval info: PRIVATE: PHASE_SHIFT_UNIT1 STRING "deg"
+// Retrieval info: PRIVATE: PHASE_SHIFT_UNIT2 STRING "deg"
 // Retrieval info: PRIVATE: PLL_ADVANCED_PARAM_CHECK STRING "0"
 // Retrieval info: PRIVATE: PLL_ARESET_CHECK STRING "0"
 // Retrieval info: PRIVATE: PLL_AUTOPLL_CHECK NUMERIC "1"
@@ -277,9 +277,9 @@ endmodule
 // Retrieval info: CONSTANT: CLK1_DUTY_CYCLE NUMERIC "50"
 // Retrieval info: CONSTANT: CLK1_MULTIPLY_BY NUMERIC "9"
 // Retrieval info: CONSTANT: CLK1_PHASE_SHIFT STRING "0"
-// Retrieval info: CONSTANT: CLK2_DIVIDE_BY NUMERIC "1"
+// Retrieval info: CONSTANT: CLK2_DIVIDE_BY NUMERIC "5"
 // Retrieval info: CONSTANT: CLK2_DUTY_CYCLE NUMERIC "50"
-// Retrieval info: CONSTANT: CLK2_MULTIPLY_BY NUMERIC "1"
+// Retrieval info: CONSTANT: CLK2_MULTIPLY_BY NUMERIC "18"
 // Retrieval info: CONSTANT: CLK2_PHASE_SHIFT STRING "0"
 // Retrieval info: CONSTANT: COMPENSATE_CLOCK STRING "CLK0"
 // Retrieval info: CONSTANT: INCLK0_INPUT_FREQUENCY NUMERIC "20000"
@@ -342,10 +342,10 @@ endmodule
 // Retrieval info: GEN_FILE: TYPE_NORMAL pll.ppf TRUE FALSE
 // Retrieval info: GEN_FILE: TYPE_NORMAL pll.inc FALSE FALSE
 // Retrieval info: GEN_FILE: TYPE_NORMAL pll.cmp FALSE FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL pll.bsf TRUE
+// Retrieval info: GEN_FILE: TYPE_NORMAL pll.bsf FALSE FALSE
 // Retrieval info: GEN_FILE: TYPE_NORMAL pll_inst.v FALSE FALSE
 // Retrieval info: GEN_FILE: TYPE_NORMAL pll_bb.v FALSE FALSE
-// Retrieval info: GEN_FILE: TYPE_NORMAL pll_waveforms.html TRUE FALSE
+// Retrieval info: GEN_FILE: TYPE_NORMAL pll_waveforms.html FALSE FALSE
 // Retrieval info: GEN_FILE: TYPE_NORMAL pll_wave*.jpg FALSE FALSE
 // Retrieval info: LIB_FILE: altera_mf
 // Retrieval info: CBX_MODULE_PREFIX: ON
