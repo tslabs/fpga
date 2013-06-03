@@ -5,7 +5,9 @@
 
 module z80
 (
-	input wire zclk,
+	input wire mclk,
+	input wire wt_clk,
+	input wire key,
 	
 	output wire romreq, ramreq,
 	output wire [15:0] a,
@@ -28,7 +30,7 @@ module z80
 	wire wt = !reset && (romreq && !wt_r[1]);
 	
 	reg [1:0] wt_r;
-	always @(posedge zclk)
+	always @(posedge mclk) if (!wt_clk)
 		if (reset)
 			wt_r <= 0;
 		else if (romreq)
@@ -36,28 +38,28 @@ module z80
 	
 // ROM to SRAM substitution
 	reg vrom;
-	always @(posedge zclk)
+	always @(posedge mclk) if (!wt_clk)
 		if (reset)
 			vrom <= 0;
 		else if (iorq)
 			vrom <= 1;
 	
 // reset generation
-	// assign reset = !key[0];
-	assign reset = &res_cnt;
+	assign reset = !key;
+	// assign reset = &res_cnt;
 	reg [20:0] res_cnt;
-	always @(posedge zclk)
+	always @(posedge mclk) if (!wt_clk)
 		res_cnt <= res_cnt + 1;
 		
 // Z80 core
 NextZ80 nextz80
 (
-	.CLK	(zclk),
+	.CLK	(mclk),
 	
 	.RESET	(reset),
 	.INT	(0),
 	.NMI	(0),
-	.WAIT	(wt),
+	.WAIT	(wt || wt_clk),
 	
 	.ADDR	(a),
 	.DI		(din),

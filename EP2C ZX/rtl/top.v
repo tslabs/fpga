@@ -38,24 +38,14 @@ module ep2c_zx
 	input wire [35:0] gpio_0, gpio_1,
 
 // debug virtual pins
-	output wire [7:0] zdataout,
-	output wire [7:0] rdata,
-	output wire [15:0] zaddr,
-	output wire zwr,
-	output wire zromreq,
-	output wire zramreq,
-	output wire ziorq,
-	output wire zhalt,
-	output wire zm1,
-	output wire zreset,
-	
-	output wire [2:0] mcyc,
-	output wire zclk, mclk, vclk,
-	output wire [15:0] sram_d_v
+	output wire [15:0] sram_d_v,
+	output wire mclk, vclk, tclk
 );
 
+	wire mcyc;
+	
 // debug virtual pins
-	assign sram_d_v = sram_d;
+	// assign sram_d_v = sram_d;
 
 // SRAM
 	assign sram_d = !sram_we_n ? {zdataout, zdataout} : 16'hZZZZ;
@@ -68,11 +58,20 @@ module ep2c_zx
 	assign flash_rst_n = 1;
 
 	wire ramwr;
-	
+
+	wire [15:0] zaddr;
+	wire [7:0] zdataout;
+	wire zwr;
+	wire zromreq;
+	wire zramreq;
+	wire ziorq;
+
 z80 z80
 (
-	.zclk	(zclk),
-	
+	.mclk	(mclk),
+	.wt_clk	(!mcyc),
+	.key	(key[0]),
+
 	.a		(zaddr),
 	.dout	(zdataout),
 	.ramreq	(zramreq),
@@ -88,7 +87,6 @@ z80 z80
 sram sram
 (
 	.mclk	(mclk),
-	.zclk	(zclk),
 	.mc		(mcyc),
 
 	.zaddr	({3'd0, zaddr}),
@@ -110,33 +108,28 @@ sram sram
 
 vga vga
 (
-	// .vclk		(vclk),
-	.vclk		(clk50),
-	.mclk		(zclk),
+	.vclk		(vclk),
+	.mclk		(mclk),
+
+	.addr		(vaddr),
+	.data		(sram_d),
+	.mstb		(mcyc),
 
 	.vga_r		(vga_r),
 	.vga_g		(vga_g),
 	.vga_b		(vga_b),
 	.vga_hs		(vga_hs),
-	.vga_vs		(vga_vs),
-
-	.vaddr		(vaddr),
-	.v_req_en	(!zramreq),
-	.v_req		(vreq),
-	.v_data		(sram_d)
+	.vga_vs		(vga_vs)
 );
 
 // PLL
-	// wire zclk;
-	// wire mclk;
-	// wire vclk;
-
+	
 pll	pll
 (
 	.inclk0	(clk50),	// 50Mhz
-	.c0		(zclk),		// 30MHz (Z80)
-	.c1		(mclk),		// 90MHz (SRAM access)
-	.c2		(vclk)		// 50MHz (VGA pixel)
+	.c0		(mclk),		// 60MHz (SRAM, CPU)
+	.c1		(vclk),		// 50MHz (VGA pixel)
+	.c2		(tclk)		// 180MHz (TAP)
 );
 
 endmodule

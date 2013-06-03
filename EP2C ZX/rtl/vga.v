@@ -7,13 +7,12 @@ module vga
 (
 	input wire vclk, mclk,
 
-	output reg [3:0] vga_r, vga_g, vga_b,
-    output reg vga_hs, vga_vs,
+	output wire [17:0] addr,
+	input wire [15:0] data,
+	input wire mstb,
 
-	output wire [17:0] vaddr,
-	input wire v_req_en,
-	output wire v_req,
-	input wire [15:0] v_data
+	output reg [3:0] vga_r, vga_g, vga_b,
+    output reg vga_hs, vga_vs
 );
 
 `include "vga_params.v"
@@ -29,25 +28,57 @@ localparam M_ZX = 2'd0;
 	wire [3:0] vb = pix ? vga_out [3:0] : {4{vcnt[1] ^ hcnt[1]}};
 
 // SRAM request
-	assign vaddr = rcnt_in;
-	assign v_req = vpix && !v_line_done;
+	assign addr = atr_n_gfx ? aaddr : gaddr;
+	wire [17:0] gaddr = {6'b000010, ycnt_in[7:6], ycnt_in[2:0], ycnt_in[5:3], xcnt[4:1]};
+	wire [17:0] aaddr = {9'b000010110, ycnt_in[7:3], xcnt[4:1]};
+	wire req = vpix && !pstb && !xcnt[5];
+	wire dstb = mstb && req;
 
-	reg fetch_stb;
+// 6912 renderer
+	wire atr_n_gfx = xcnt[0];
+	wire pstb = !pcnt[4];
+	
+	reg [5:0] xcnt;
 	always @(posedge mclk)
-		fetch_stb <= v_req;
-
+		if (line_reset_s)
+			xcnt <= 0;
+		else if (dstb)
+			xcnt <= xcnt + 1;
+		
+	reg [4:0] pcnt;
+	always @(posedge mclk)
+		if (line_reset_s)
+			pcnt <= 5'h10;
+		else if (dstb && xcnt[0])
+			pcnt <= 0;
+		else if (pstb)
+			pcnt <= pcnt + 1;
+	
+	reg [15:0] gfx, atr;
+	always @(posedge mclk)
+			if (atr_n_gfx)
+				atr <= data;
+			else
+				gfx <= data;
+	
+	wire flash = 0;
+	wire zx_dot = gfx[{pcnt[3], ~pcnt[2:0]}];
+	wire [7:0] zx_attr	= ~pcnt[3] ? atr[7:0] : atr[15:8];
+	wire [3:0] zx_pix = {zx_attr[6], zx_dot ^ (flash & zx_attr[7]) ? zx_attr[2:0] : zx_attr[5:3]};
+	wire [1:0] zx_r = zx_pix[1] ? (zx_pix[3] ? 2'b11 : 2'b10 ) : 2'b00;
+	wire [1:0] zx_g = zx_pix[2] ? (zx_pix[3] ? 2'b11 : 2'b10 ) : 2'b00;
+	wire [1:0] zx_b = zx_pix[0] ? (zx_pix[3] ? 2'b11 : 2'b10 ) : 2'b00;
+	wire [11:0] pdata = {zx_r, 2'b0, zx_g, 2'b0, zx_b, 2'b0};
+	
 // raster in address counters (memory clock domain)
-	wire  v_line_done = (xcnt_in >= 256);
-	wire v_frame_done = (ycnt_in >= 192);
-	wire v_done = v_line_done || v_frame_done;
-
-	wire [18:0] rcnt_in_next = frame_reset_s ? 0 : (fetch_stb ? (rcnt_in + 1) : rcnt_in);
-	wire  [9:0] xcnt_in_next =  line_reset_s ? 0 : (fetch_stb ? (xcnt_in + 1) : xcnt_in);
-	wire  [9:0] ycnt_in_next = frame_reset_s ? 0 : (line_reset_s ? (ycnt_in + 1) : ycnt_in);
+	wire [18:0] rcnt_in_next = frame_reset_s ? 0 : ((vpix && pstb) ? (rcnt_in + 1) : rcnt_in);
+	wire  [9:0] xcnt_in_next =  line_reset_s ? 0 : (pstb ? (xcnt_in + 1) : xcnt_in);
+	wire  [9:0] ycnt_in_next = frame_reset_s ? 0 : ((vpix && line_reset_s) ? (ycnt_in + 1) : ycnt_in);
 
 	reg [18:0] rcnt_in;
 	reg  [9:0] xcnt_in;
 	reg  [9:0] ycnt_in;
+	
 	always @(posedge mclk)
 	begin
 		rcnt_in <= rcnt_in_next;
@@ -124,13 +155,13 @@ localparam M_ZX = 2'd0;
 	end
 
 // noise generator
-	wire [3:0] noise_r = pcnt[150:147];
-	wire [3:0] noise_g = pcnt[145:142];
-	wire [3:0] noise_b = pcnt[140:137];
+	wire [3:0] noise_r = noise[150:147];
+	wire [3:0] noise_g = noise[145:142];
+	wire [3:0] noise_b = noise[140:137];
 
-	reg [150:0] pcnt;
+	reg [150:0] noise;
 	always @(posedge vclk)
-		pcnt = {pcnt[149:0], pcnt[150]} ^ hcnt + vcnt;
+		noise = {noise[149:0], noise[150]} ^ hcnt + vcnt;
 
 // VGA FIFO buffer
 	wire [11:0] vga_out;
@@ -139,10 +170,11 @@ vga_fifo vga_fifo
 (
 	.rdclock	(vclk),
 	.wrclock	(mclk),
-	.data		(v_data),
-	// .data		(pcnt[150:133]),
+	// .data		(data),
+	.data		(pdata),
 	.wraddress	(xcnt_in),
-	.wren		(fetch_stb),
+	// .wren		(stb),
+	.wren		(pstb),
 	.rdaddress	(xcnt_out),
 	.q			(vga_out)
 );
