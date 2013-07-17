@@ -41,7 +41,7 @@ set_global_assignment -name DEVICE "EPM3128ATC100-10"
 set_global_assignment -name TOP_LEVEL_ENTITY tsxb_cpld
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION "11.0 SP1"
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "10:44:02  MAY 22, 2013"
-set_global_assignment -name LAST_QUARTUS_VERSION "11.0 SP1"
+set_global_assignment -name LAST_QUARTUS_VERSION 8.1
 set_global_assignment -name VERILOG_FILE ../src/top.v
 set_global_assignment -name DEVICE_FILTER_PACKAGE "ANY QFP"
 set_global_assignment -name DEVICE_FILTER_PIN_COUNT 100
@@ -52,3 +52,13 @@ set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
 set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS OFF
 set_global_assignment -name OPTIMIZE_HOLD_TIMING OFF
 set_global_assignment -name FITTER_EFFORT "STANDARD FIT"
+set_global_assignment -name MAX7000_DEVICE_IO_STANDARD "3.3-V LVTTL"
+set_global_assignment -name FMAX_REQUIREMENT "50 MHz" -section_id clk
+set_instance_assignment -name CLOCK_SETTINGS clk -to clk
+set_global_assignment -name MAX7000_OPTIMIZATION_TECHNIQUE SPEED
+set_global_assignment -name AUTO_LCELL_INSERTION OFF
+set_global_assignment -name AUTO_TURBO_BIT ON
+set_global_assignment -name ECO_OPTIMIZE_TIMING ON
+set_global_assignment -name ECO_REGENERATE_REPORT ON
+set_global_assignment -name RTLV_GROUP_COMB_LOGIC_IN_CLOUD_TMV OFF
+set_global_assignment -name ANALYZE_LATCHES_AS_SYNCHRONOUS_ELEMENTS OFF
