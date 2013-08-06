@@ -1,7 +1,7 @@
 module tsxb_cpld
 (
 	// clock
-	input wire clk,			// dedicated In
+	input wire clk50,			// dedicated In
 
 	// ZX-BUS connector
 	inout wire [15:0] za,
@@ -11,12 +11,22 @@ module tsxb_cpld
 	output wire zbusrq_n,
 	input wire zbusak_n,	// dedicated In
 	output wire ziorge_n,
+	input wire zcsrom_n,
+	output wire zrdrom_n,
 
 	// FPGA connector
-	inout wire [15:0] fa,
+	inout wire [7:0] fa,
+	inout wire fa_sel,
 	inout wire frd_n, fwr_n, fmrq_n, fiorq_n,
 	input wire fbusrq_n,
-	input wire fiorge_n_forq,	// Host Master: IORGE / Host Slave: FPGA Data Bus Output Enable, correspondent T80 signal may be used
+	input wire fiorge_n_forq_n,
+
+	// ~FIORGE/FORQ
+	// When host is master, FPGA asserts this signal as ~IORGE in either I/O address decoding cycle or
+	// together with host ~ZCSROM active, if FPGA wants to replace host ROM.
+	// Together with host ~RD active it drives data output from FPGA to host.
+	// When ~ZCSROM and ~IORGE both active ~RDROM is set to 1 and host ROM is blocked.
+	// When host is slave: ~FORQ means that FPGA wants to output data. Similar T80 signal may be used for this purpose.
 
 	// ZX-BUS bus transmitter
 	output wire ddir,
@@ -31,39 +41,53 @@ module tsxb_cpld
 );
 
 	wire [7:0] zd = {zd7, zd6, zd5, zd4, zd3, zd2, zd1, zd0};
-	wire fiorge_n = fiorge_n_forq;	// just aliases
-	wire forq = fiorge_n_forq;      //
+	wire fiorge_n = fiorge_n_forq_n;	// just aliases
+	wire forq_n = fiorge_n_forq_n;      //
 
-// ZX-BUS handling
-	wire slave_mode = fbusrq_n || zbusak_n;
+// ZXBUS handling
+
+	/* ZXBUS bus */
+	assign zd0 = (zbusak_n && stat_hit) ? nstatus : 1'bZ;
+	assign zd7 = (zbusak_n && stat_hit) ? conf_done : 1'bZ;
+	assign za = zbusak_n ? 16'hZZZZ : faddr;
+	assign zrd_n = zbusak_n ? 1'bZ : frd_n;
+	assign zwr_n = zbusak_n ? 1'bZ : fwr_n;
+	assign zmrq_n = zbusak_n ? 1'bZ : fmrq_n;
+	assign ziorq_n = zbusak_n ? 1'bZ : fiorq_n;
+	assign zbusrq_n = fbusrq_n;
+	assign ziorge_n = (zbusak_n ? fiorge_n : 1'b1) && !conf_hit && !data_hit;
+	assign zrdrom_n = (!zcsrom_n && !fiorge_n && zbusak_n) ? 1'b1 : 1'bZ;
 
 	/* FPGA bus */
-	assign fa = slave_mode ? za : 16'hZZZZ;
-	assign frd_n = slave_mode ? zrd_n : 1'bZ;
-	assign fwr_n = slave_mode ? zwr_n : 1'bZ;
-	assign fmrq_n = slave_mode ? zmrq_n : 1'bZ;
-	assign fiorq_n = slave_mode ? ziorq_n : 1'bZ;
-	
-	/* ZXBUS bus */
-	assign zd0 = (slave_mode && stat_hit) ? nstatus : 1'bZ;
-	assign zd7 = (slave_mode && stat_hit) ? conf_done : 1'bZ;
-	assign za = slave_mode ? 16'hZZZZ : fa;
-	assign zrd_n = slave_mode ? 1'bZ : frd_n;
-	assign zwr_n = slave_mode ? 1'bZ : fwr_n;
-	assign zmrq_n = slave_mode ? 1'bZ : fmrq_n;
-	assign ziorq_n = slave_mode ? 1'bZ : fiorq_n;
-	assign zbusrq_n = fbusrq_n;
-	assign ziorge_n = (slave_mode ? fiorge_n : 1'b1) && !conf_hit && !data_hit;
+	assign fa = zbusak_n ? zaddr : 8'hZZ;
+	assign fa_sel = zbusak_n ? fsel_r : 1'bZ;
+	assign frd_n = zbusak_n ? zrd_n : 1'bZ;
+	assign fwr_n = zbusak_n ? zwr_n : 1'bZ;
+	assign fmrq_n = zbusak_n ? zmrq_n : 1'bZ;
+	assign fiorq_n = zbusak_n ? ziorq_n : 1'bZ;
+
+	/* FPGA address muxing */
+	wire [7:0] zaddr = fa_sel ? za[15:8] : za[7:0];
+	wire [15:0] faddr = {fa_h, fa};
+
+	reg fsel_r;
+	always @(posedge clk50)
+		fsel_r <= ~fsel_r;
+
+	reg [7:0] fa_h;
+	always @(posedge clk50)
+		if (fa_sel)
+			fa_h <= fa;
 
 	/* 16245 data direction */
 	localparam FPGA_TO_ZXBUS = 1'b0;
 	localparam ZXBUS_TO_FPGA = 1'b1;
-	
-	assign ddir = slave_mode ? slave_dir : master_dir;
+
+	assign ddir = zbusak_n ? slave_dir : master_dir;
 		// in Slave mode FPGA outputs data only if own address decoded and read request from host received
 	wire slave_dir = (!fiorge_n && !zrd_n) ? FPGA_TO_ZXBUS : ZXBUS_TO_FPGA;
 		// in Master mode FPGA outputs data only by FORQ request
-	wire master_dir = forq ? FPGA_TO_ZXBUS : ZXBUS_TO_FPGA;
+	wire master_dir = forq_n ? ZXBUS_TO_FPGA : FPGA_TO_ZXBUS;
 
 // PS configuration
 
@@ -97,7 +121,7 @@ module tsxb_cpld
 	reg data_hit_r;
 	reg ctrl_hit_r;
 	reg nconfig_r;
-	always @(posedge clk)
+	always @(posedge clk50)
 	begin
 		data_hit_r <= data_hit;
 		ctrl_hit_r <= ctrl_hit;
@@ -106,14 +130,14 @@ module tsxb_cpld
 
 	/* PS mode latch */
 	reg ps_mode = 0;
-	always @(posedge clk)
+	always @(posedge clk50)
 		if (!nconfig_r)
 			ps_mode <= msel0;
-		
+
 	/* configuration control register */
 	reg config_int = 0;
 	reg msel0_int = 0;
-	always @(posedge clk)
+	always @(posedge clk50)
 		if (ctrl_hit_r)
 		begin
 			config_int <= zd0;
@@ -124,7 +148,7 @@ module tsxb_cpld
 	reg [7:0] bs_shift;
 	reg [3:0] bit_cnt = 4'b1000;
 	reg dclk_int = 0;
-	always @(posedge clk)
+	always @(posedge clk50)
 		if (data_hit_r)
 		begin
 			bs_shift <= zd;
