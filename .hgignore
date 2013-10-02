@@ -1,0 +1,11 @@
+syntax: glob
+*/db/*
+*/incremental_db/*
+*.rpt
+*.done
+*.smsg
+*.summary
+*.jdi
+*.qdf
+*.pin
+*.stp
