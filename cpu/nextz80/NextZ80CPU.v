@@ -1008,7 +1008,7 @@ module NextZ80
 										WE 		= 6'b010000;	// PC
 										fetch98 = 2'b10;	
 										
-										add_wait = STAGE[0] ? 2: 3; //zek 4t
+										add_wait = CPUStatus[4] ? 5: 3; //zek 7t|4t
 									end
 									2'b01: begin
 										ALU160_SEL = 1;			// PC
@@ -1601,7 +1601,7 @@ module NextZ80
 						WE 		= 6'b010x00;			// PC
 						REG_RSEL	= 4'b110x;				// const	  
 						
-						add_wait =  4; //zek 8t отфоноря
+						add_wait =  13; //zek 16t отфоноря
 					end
 				endcase
 			4'b1100:				// INT
@@ -1655,7 +1655,7 @@ module NextZ80
 								WE 		= 6'b010x00;			// PC
 								REG_RSEL	= 4'b111x;				// tmp16	 
 								
-								add_wait =  15; //zek 6t inta + 17call отфоноря
+								add_wait =  11; //zek 16t 6t inta + 10t call отфоноря
 							end
 						endcase
 				endcase
