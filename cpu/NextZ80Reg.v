@@ -81,56 +81,40 @@ module Z80Reg(
 	reg  [15:0]DIN;		// RAM W in data
 	reg [15:0]mux_rdor;	// (3)A reversed mixed with TL, (4)I mixed with R (5)SP
 	
-//------------------------------------ RAM block registers ----------------------------------
-// 0:BC, 1:DE, 2:HL, 3:A-x, 4:I-x, 5:IX, 6:IY, 7:x-x, 8:BC', 9:DE', 10:HL', 11:A'-x, 12: tmpSP, 13:zero
-   RAM16X1D #(
-      .INIT(16'h0000) 		// Initial contents of RAM
-   ) RAM16X1D_bit0 (
-      .DPO(rdor[0]),     	// Read-only 1-bit data output
-      .SPO(rdow[0]),     	// Rw/ 1-bit data output
-      .A0(SELW[0]),       	// Rw/ address[0] input bit
-      .A1(SELW[1]),       	// Rw/ address[1] input bit
-      .A2(SELW[2]),       	// Rw/ address[2] input bit
-      .A3(SELW[3]),       	// Rw/ address[3] input bit
-      .D(DIN[0]),         	// Write 1-bit data input
-      .DPRA0(SELR[0]), 		// Read-only address[0] input bit
-      .DPRA1(SELR[1]), 		// Read-only address[1] input bit
-      .DPRA2(SELR[2]), 		// Read-only address[2] input bit
-      .DPRA3(SELR[3]), 		// Read-only address[3] input bit
-      .WCLK(CLK),   			// Write clock input
-      .WE(WE[0] & !WAIT)        	// Write enable input
-   );
-
-   RAM16X1D #(.INIT(16'h0000)) RAM16X1D_bit1 (.DPO(rdor[1]), .SPO(rdow[1]), .A0(SELW[0]), .A1(SELW[1]), .A2(SELW[2]), .A3(SELW[3]), .D(DIN[1]),  
-																.DPRA0(SELR[0]), .DPRA1(SELR[1]), .DPRA2(SELR[2]), .DPRA3(SELR[3]), .WCLK(CLK), .WE(WE[0] & !WAIT));
-   RAM16X1D #(.INIT(16'h0000)) RAM16X1D_bit2 (.DPO(rdor[2]), .SPO(rdow[2]), .A0(SELW[0]), .A1(SELW[1]), .A2(SELW[2]), .A3(SELW[3]), .D(DIN[2]),     
-																.DPRA0(SELR[0]), .DPRA1(SELR[1]), .DPRA2(SELR[2]), .DPRA3(SELR[3]), .WCLK(CLK), .WE(WE[0] & !WAIT));
-   RAM16X1D #(.INIT(16'h0000)) RAM16X1D_bit3 (.DPO(rdor[3]), .SPO(rdow[3]), .A0(SELW[0]), .A1(SELW[1]), .A2(SELW[2]), .A3(SELW[3]), .D(DIN[3]), 
-																.DPRA0(SELR[0]), .DPRA1(SELR[1]), .DPRA2(SELR[2]), .DPRA3(SELR[3]), .WCLK(CLK), .WE(WE[0] & !WAIT));
-   RAM16X1D #(.INIT(16'h0000)) RAM16X1D_bit4 (.DPO(rdor[4]), .SPO(rdow[4]), .A0(SELW[0]), .A1(SELW[1]), .A2(SELW[2]), .A3(SELW[3]), .D(DIN[4]), 
-																.DPRA0(SELR[0]), .DPRA1(SELR[1]), .DPRA2(SELR[2]), .DPRA3(SELR[3]), .WCLK(CLK), .WE(WE[0] & !WAIT));
-   RAM16X1D #(.INIT(16'h0000)) RAM16X1D_bit5 (.DPO(rdor[5]), .SPO(rdow[5]), .A0(SELW[0]), .A1(SELW[1]), .A2(SELW[2]), .A3(SELW[3]), .D(DIN[5]),    
-																.DPRA0(SELR[0]), .DPRA1(SELR[1]), .DPRA2(SELR[2]), .DPRA3(SELR[3]), .WCLK(CLK), .WE(WE[0] & !WAIT));
-   RAM16X1D #(.INIT(16'h0000)) RAM16X1D_bit6 (.DPO(rdor[6]), .SPO(rdow[6]), .A0(SELW[0]), .A1(SELW[1]), .A2(SELW[2]), .A3(SELW[3]), .D(DIN[6]),    
-																.DPRA0(SELR[0]), .DPRA1(SELR[1]), .DPRA2(SELR[2]), .DPRA3(SELR[3]), .WCLK(CLK), .WE(WE[0] & !WAIT));
-   RAM16X1D #(.INIT(16'h0000)) RAM16X1D_bit7 (.DPO(rdor[7]), .SPO(rdow[7]), .A0(SELW[0]), .A1(SELW[1]), .A2(SELW[2]), .A3(SELW[3]), .D(DIN[7]),
-																.DPRA0(SELR[0]), .DPRA1(SELR[1]), .DPRA2(SELR[2]), .DPRA3(SELR[3]), .WCLK(CLK), .WE(WE[0] & !WAIT));
-   RAM16X1D #(.INIT(16'h0000)) RAM16X1D_bit8 (.DPO(rdor[8]), .SPO(rdow[8]), .A0(SELW[0]), .A1(SELW[1]), .A2(SELW[2]), .A3(SELW[3]), .D(DIN[8]),
-																.DPRA0(SELR[0]), .DPRA1(SELR[1]), .DPRA2(SELR[2]), .DPRA3(SELR[3]), .WCLK(CLK), .WE(WE[1] & !WAIT));
-   RAM16X1D #(.INIT(16'h0000)) RAM16X1D_bit9 (.DPO(rdor[9]), .SPO(rdow[9]), .A0(SELW[0]), .A1(SELW[1]), .A2(SELW[2]), .A3(SELW[3]), .D(DIN[9]),    
-																.DPRA0(SELR[0]), .DPRA1(SELR[1]), .DPRA2(SELR[2]), .DPRA3(SELR[3]), .WCLK(CLK), .WE(WE[1] & !WAIT));
-   RAM16X1D #(.INIT(16'h0000)) RAM16X1D_bit10(.DPO(rdor[10]), .SPO(rdow[10]), .A0(SELW[0]), .A1(SELW[1]), .A2(SELW[2]), .A3(SELW[3]), .D(DIN[10]),   
-																 .DPRA0(SELR[0]), .DPRA1(SELR[1]), .DPRA2(SELR[2]), .DPRA3(SELR[3]), .WCLK(CLK), .WE(WE[1] & !WAIT));
-   RAM16X1D #(.INIT(16'h0000)) RAM16X1D_bit11(.DPO(rdor[11]), .SPO(rdow[11]), .A0(SELW[0]), .A1(SELW[1]), .A2(SELW[2]), .A3(SELW[3]), .D(DIN[11]),    
-																 .DPRA0(SELR[0]), .DPRA1(SELR[1]), .DPRA2(SELR[2]), .DPRA3(SELR[3]), .WCLK(CLK), .WE(WE[1] & !WAIT));
-   RAM16X1D #(.INIT(16'h0000)) RAM16X1D_bit12(.DPO(rdor[12]), .SPO(rdow[12]), .A0(SELW[0]), .A1(SELW[1]), .A2(SELW[2]), .A3(SELW[3]), .D(DIN[12]), 
-																.DPRA0(SELR[0]), .DPRA1(SELR[1]), .DPRA2(SELR[2]), .DPRA3(SELR[3]), .WCLK(CLK), .WE(WE[1] & !WAIT));
-   RAM16X1D #(.INIT(16'h0000)) RAM16X1D_bit13(.DPO(rdor[13]), .SPO(rdow[13]), .A0(SELW[0]), .A1(SELW[1]), .A2(SELW[2]), .A3(SELW[3]), .D(DIN[13]),
-																.DPRA0(SELR[0]), .DPRA1(SELR[1]), .DPRA2(SELR[2]), .DPRA3(SELR[3]), .WCLK(CLK), .WE(WE[1] & !WAIT));
-   RAM16X1D #(.INIT(16'h0000)) RAM16X1D_bit14(.DPO(rdor[14]), .SPO(rdow[14]), .A0(SELW[0]), .A1(SELW[1]), .A2(SELW[2]), .A3(SELW[3]), .D(DIN[14]), 
-																.DPRA0(SELR[0]), .DPRA1(SELR[1]), .DPRA2(SELR[2]), .DPRA3(SELR[3]), .WCLK(CLK), .WE(WE[1] & !WAIT));
-   RAM16X1D #(.INIT(16'h0000)) RAM16X1D_bit15(.DPO(rdor[15]), .SPO(rdow[15]), .A0(SELW[0]), .A1(SELW[1]), .A2(SELW[2]), .A3(SELW[3]), .D(DIN[15]),
-																.DPRA0(SELR[0]), .DPRA1(SELR[1]), .DPRA2(SELR[2]), .DPRA3(SELR[3]), .WCLK(CLK), .WE(WE[1] & !WAIT));
+	// RAM16X1D x16
+	reg  [7:0] REGH [0:15];
+	reg  [7:0] REGL [0:15];
+	
+	always @ (posedge CLK)	  
+	begin
+		if (WE[0] & !WAIT) #1 REGL[SELW] = DIN[7:0];
+		if (WE[1] & !WAIT) #1 REGH[SELW] = DIN[15:8];
+	end
+	
+	assign rdow = { REGH[SELW], REGL[SELW]};
+	assign rdor = { REGH[SELR], REGL[SELR]};	
+	
+	initial
+	begin
+		{REGH[0],  REGL[0]} = 0;	
+		{REGH[1],  REGL[1]} = 0;
+		{REGH[2],  REGL[2]} = 0;
+		{REGH[3],  REGL[3]} = 0;
+		{REGH[4],  REGL[4]} = 0;
+		{REGH[5],  REGL[5]} = 0;
+		{REGH[6],  REGL[6]} = 0;
+		{REGH[7],  REGL[7]} = 0;
+		{REGH[8],  REGL[8]} = 0;
+		{REGH[9],  REGL[9]} = 0;
+		{REGH[10], REGL[10]} = 0;
+		{REGH[11], REGL[11]} = 0;
+		{REGH[12], REGL[12]} = 0;
+		{REGH[13], REGL[13]} = 0;
+		{REGH[14], REGL[14]} = 0;
+		{REGH[15], REGL[15]} = 0;
+	end
+	
+	
 	wire [15:0]ADDR1 = ADDR + !ALU16OP[2]; // address post increment
 	wire [7:0]flgmux = {ALU8FLAGS[7:3], SELR[3:0] == 4'b0100 ? rstatus[7] : ALU8FLAGS[2], ALU8FLAGS[1:0]}; // LD A, I/R IFF2 flag on parity
 	always @(posedge CLK)
