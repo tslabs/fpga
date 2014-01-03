@@ -59,27 +59,29 @@
 //		Tested with ZEXALL (all OK except CPx(R), LDx(R), BIT n, (IX/IY+d), BIT n, (HL) - fail because of the un-documented XF and YF flags).
 // 
 ///////////////////////////////////////////////////////////////////////////////////
-`timescale 1ns / 1ps
+`timescale 1ns / 1ps   
+//`define debug
 
 module NextZ80
 (
 		input wire[7:0] DI,
 		output wire[7:0] DO,
 		output wire[15:0] ADDR,
-		output reg WR,
+		output wire WR,
 		output reg MREQ,
 		output reg IORQ,
 		output reg HALT,
-		output reg M1,
+		output wire M1,
 		input wire CLK,
 		input wire RESET,
 		input wire INT,
 		input wire NMI,
 		input	wire WAIT,
-		output wire [3:0] STALL
+		output	wire STALL,
+		output	reg BLOCK
 );
 
-	reg [3:0]	add_wait;
+	reg 	[4:0]	add_wait;
 	assign  STALL = add_wait;
 
 // connections and registers
@@ -118,11 +120,43 @@ module NextZ80
 	reg 	SRESET = 0;
 	reg	SINT = 0;
 	wire	[2:0]intop = FETCH[1] ? 4 : (FETCH[0] ? 5 : 6);
-	reg 	xmask;
+	reg 	xmask;	   
+	
+	
+	// compatible timing block
+	reg 	[4:0] stall_cnt; 
+	reg		res_stall;
+	wire	set_stall = add_wait !=0 && !next_stage;// && status[3:0] == 0;
+	wire	stall = res_stall ? 1'b0 : set_stall;
+	wire	int_wait = WAIT | stall;  
+	
+	always @ (posedge CLK)
+	if (RESET)
+		stall_cnt <= 0;
+	else
+	begin					
+		if (stall_cnt == 0)							
+		begin
+			if (set_stall) 
+				stall_cnt <= add_wait -1;
+		end
+		else 
+			stall_cnt <= stall_cnt - 1;
+			
+		res_stall <= stall_cnt == 1;
+	end						
+	
+	
+	assign	STALL = stall;
+	
+	reg		int_m1;		
+	assign	M1 = stall ? 1'b0 : int_m1;
+	reg		int_wr;
+	assign	WR = stall ? 1'b0 : int_wr;
 
 	Z80Reg CPU_REGS (
 		 .rstatus(CPUStatus[7:0]), 
-		 .M1(M1), 
+		 .M1(int_m1), 
 		 .WE(WE), 
 		 .CLK(CLK), 
 		 .ALU8OUT(ALU8OUT), 
@@ -143,7 +177,7 @@ module NextZ80
 		 .DINW_SEL(DINW_SEL),
 		 .XMASK(xmask),
 		 .ALU16OP(ALU16OP),			// used for post increment for ADDR, SP mux re-direct
-		 .WAIT(WAIT)
+		 .WAIT(int_wait)
 		 );
 
 	ALU8 CPU_ALU8 (
@@ -163,10 +197,12 @@ module NextZ80
 		 .D1(ALU161), 
 		 .DOUT(ADDR), 
 		 .OP(ALU16OP)
-		 );
-
-	always @(posedge CLK)
-		if(!WAIT) begin
+		 );				 
+	
+	always @(posedge CLK)  
+	begin
+		if(!int_wait) 
+		begin	
 			SRESET <= RESET;
 			SNMI <= NMI;
 			SINT <= INT;
@@ -175,7 +211,7 @@ module NextZ80
 			else 
 				if(FETCH[9:6] == 4'b1110) {FETCH[9:7]} <= 3'b000;	// exit RESET state
 				else begin 
-					if(M1)
+					if(int_m1)
 						case({MREQ, CPUStatus[9:8]})
 							3'b000, 3'b001, 3'b100, 3'b101, 3'b110, 3'b111: FETCH <= {fetch98, DI};
 							3'b010: FETCH <= {fetch98, 8'hff};	// IM1 - RST38
@@ -183,27 +219,35 @@ module NextZ80
 						endcase
 					if(~|{next_stage, fetch98[1:0], status[4]})				// INT or NMI sample
 						if(SNMI & !FNMI) begin						// NMI posedge
-							{FETCH[9:6], FETCH[1:0]} <= {4'b1101, HALT, M1};
+							{FETCH[9:6], FETCH[1:0]} <= {4'b1101, HALT, int_m1};
 							FNMI <= 1;	// NMI acknowledged
-						end else if(SINT & CPUStatus[6] & !status[11]) {FETCH[9:6], FETCH[1:0]} <= {4'b1100, HALT, M1};	// INT request
+						end else if(SINT & CPUStatus[6] & !status[11]) {FETCH[9:6], FETCH[1:0]} <= {4'b1100, HALT, int_m1};	// INT request
 				end
 			if(next_stage) STAGE <= STAGE + 3'b001;
 			else STAGE <= 0;
+				
 			if(status[4]) CPUStatus[5:4] <= status[5:4];
-			else if(~|{next_stage, fetch98[1]} | fetch98[0]) CPUStatus[4] <= 1'b0;		// clear X
+			else 
+			if(~|{next_stage, fetch98[1]} | fetch98[0]) CPUStatus[4] <= 1'b0;		// clear X
 			CPUStatus[3:0] <= CPUStatus[3:0] ^ status[3:0];
 			if(status[11]) CPUStatus[7:6] <= status[7:6]; 	// IFF2:1
 			if(status[10]) CPUStatus[9:8] <= status[9:8];	// IMM
-			tzf <= ALU8FLAGS[6];
-		end
+			tzf <= ALU8FLAGS[6]; 
+		end	
+	end
 
 	assign opd[0] = FETCH[0] ^ &FETCH[2:1];
 	assign opd[2:1] = FETCH[2:1];
 	assign opd[3] = FETCH[3] ^ &FETCH[5:4];
 	assign opd[5:4] = FETCH[5:4];
 	assign op16[2:0] = &FETCH[5:4] ? 3'b101 : {1'b0, FETCH[5:4]};
-
+		
+`ifdef debug	
+	wire	#1 CLK_F1 = CLK;
+	always @ (posedge CLK) begin
+`else
 	always @* begin
+`endif
 		DO_SEL	= 2'bxx;						// ALU80 - th - flags - ALU8OUT[7:0]
 		ALU160_SEL = 1'bx;					// regs - pc
 		DINW_SEL = 1'bx;						// ALU8OUT - DI
@@ -213,10 +257,11 @@ module NextZ80
 		next_stage = 0;
 		REG_WSEL	= 4'bxxxx;
 		REG_RSEL	= 4'bxxxx;
-		M1 		= 1;
+		int_m1 		= 1;
 		MREQ		= 1;
-		WR			= 0;
-
+		int_wr		= 0;   	
+		BLOCK		= 0;
+		
 		HALT = 0;
 		IORQ = 0;
 		status	= 12'b00xxxxx00000;
@@ -226,14 +271,14 @@ module NextZ80
 			4'b0000, 4'b0001, 4'b0010, 4'b0011, 4'b0100, 4'b1000, 4'b1100: xmask = 1;
 			default: xmask = 0;
 		endcase
-		
+
 		case(FETCH[9:6])	
 //------------------------------------------- block 00 ----------------------------------------------------
 			4'b0000:
 				case(FETCH[3:0])
 //				-----------------------		NOP, EX AF, AF', DJNZ, JR, JR c --------------------
 					4'b0000, 4'b1000:	
-						case(FETCH[5:4])
+						case(FETCH[5:4])				     
 							2'b00: begin					// NOP, EX AF, AF'
 								DO_SEL	= 2'bxx;			
 								ALU160_SEL = 1;			// PC
@@ -251,7 +296,7 @@ module NextZ80
 										REG_WSEL	= 4'b0000;			// B
 									end
 									next_stage = 1;
-									M1 		= 0;
+									int_m1 		= 0;
 								end else if(FETCH[3]) begin	// JR - stage2
 									ALU160_SEL = 1;				// pc
 									WE 		= 6'b010x00;		// PC
@@ -275,13 +320,13 @@ module NextZ80
 										WE 		= 6'b010x00;		// PC
 										ALU16OP	= STAGE[0] ? 3'd3 : 3'd1;		// ADD/ INC, post inc	
 										
-										add_wait = STAGE[0] ?  10 : 5; //zek 12|7
+										add_wait = STAGE[0] ?  10 : 6; //zek 12|7
 									end 
 									2'b01: begin
 										ALU160_SEL = 1;				// pc
 										WE 		= 6'b010100;		// PC, tmpHI
 										next_stage = 1; 
-										M1 		= 0;
+										int_m1 		= 0;
 									end
 								endcase
 						endcase
@@ -294,7 +339,7 @@ module NextZ80
 								WE 		= {4'b010x, STAGE[0] ? 1'b1 : 1'bx, !STAGE[0]};	// PC, lo/HI
 								next_stage = 1;
 								REG_WSEL	= {op16, 1'bx}; 
-								M1 		= 0;				
+								int_m1 		= 0;				
 							end
 							3'b10_0, 3'b11_1: begin		// BC, DE, HL, stage3, SP stage4
 								ALU160_SEL = 1;			// pc
@@ -308,7 +353,7 @@ module NextZ80
 								ALU16OP	= 4;				// NOP
 								next_stage = 1;
 								REG_RSEL	= 4'b101x;		// tmpSP
-								M1 		= 0;
+								int_m1 		= 0;
 								MREQ		= 0;
 							end
 						endcase
@@ -325,15 +370,15 @@ module NextZ80
 									next_stage = 1;
 									REG_WSEL	= FETCH[3] ? 4'b011x : 4'b0110;	// A
 									REG_RSEL	= {op16, 1'bx};
-									M1 		= 0;
-									WR = !FETCH[3];
+									int_m1 		= 0;
+									int_wr = !FETCH[3];
 								end else begin						// LD (nn) A - LD (nn) HL - stage 1
 									ALU160_SEL = 1;				// PC
 									DINW_SEL = 1;					// DI
 									WE 		= 6'b010xx1;		// PC, lo
 									next_stage = 1;
 									REG_WSEL	= 4'b111x;
-									M1 		= 0;
+									int_m1 		= 0;
 								end
 							3'b001:
 								if(FETCH[5] == 0) begin			// LD (BC), A, LD (DE), A - stage2
@@ -347,13 +392,13 @@ module NextZ80
 									WE 		= 6'b010x10;		// PC, hi
 									next_stage = 1;
 									REG_WSEL	= 4'b111x;
-									M1 		= 0;
+									int_m1 		= 0;
 								end
 							3'b010: begin					
 								ALU160_SEL = 1'b0;		// regs
 								REG_RSEL	= 4'b111x;
-								M1 		= 0;
-								WR			= !FETCH[3];
+								int_m1 		= 0;
+								int_wr			= !FETCH[3];
 								next_stage = 1;
 								if(FETCH[3]) begin		// LD A (nn)  - LD HL (nn) - stage 3
 									DINW_SEL = 1;				// DI
@@ -370,11 +415,11 @@ module NextZ80
 									ALU160_SEL = 1;			// pc
 									WE 		= 6'b010x00;	// PC	  
 									
-									add_wait = 10; // zek 13
+									add_wait = 9; // zek 13
 								end else begin					
 									REG_RSEL	= 4'b111x;
-									M1 		= 0;
-									WR			= !FETCH[3];
+									int_m1 		= 0;
+									int_wr			= !FETCH[3];
 									ALU160_SEL = 1'b0;		// regs
 									ALU16OP	= 1;				// INC
 									next_stage = 1;
@@ -391,7 +436,7 @@ module NextZ80
 							3'b100: begin				// LD (nn),HL - stage 5
 								ALU160_SEL = 1;			// pc
 								WE 		= 6'b010x00;	// PC					
-								add_wait = 12; // zek 14
+								add_wait = 11; // zek 14
 							end
 						endcase
 //				-----------------------		inc/dec rr   --------------------
@@ -403,7 +448,7 @@ module NextZ80
 								ALU16OP	= {FETCH[3], 1'b0, FETCH[3]};		// post inc, dec
 								next_stage = 1;
 								REG_RSEL	= 4'b101x;		// sp
-								M1 		= 0;
+								int_m1 		= 0;
 								MREQ		= 0;
 							end else begin					// BC, DE, HL - stage 1
 								ALU160_SEL = 1;			// pc
@@ -440,13 +485,13 @@ module NextZ80
 								next_stage = 1;
 								REG_WSEL	= 4'b011x;				// tmpLO
 								REG_RSEL	= 4'b010x;				// HL
-								M1 		= 0;
+								int_m1 		= 0;
 							end
 							3'b00_1:	begin							// (X) - stage1
 								ALU160_SEL = 1;					// pc
 								WE 		= 6'b010100;			// PC, tmpHI
 								next_stage = 1;
-								M1 		= 0;
+								int_m1 		= 0;
 							end 
 							3'b01_0, 3'b10_1: begin					// (HL) stage2, (X) - stage3
 								DO_SEL	= 2'b11;						// ALU80OUT
@@ -457,8 +502,8 @@ module NextZ80
 								next_stage = 1;
 								REG_WSEL	= 4'b0111;					// tmpLO
 								REG_RSEL	= 4'b010x;					// HL
-								M1 		= 0;
-								WR			= 1;
+								int_m1 		= 0;
+								int_wr			= 1;
 							end
 							3'b10_0, 3'b11_1: begin					// (HL) - stage3, (X) - stage 4
 								ALU160_SEL = 1;						// pc
@@ -475,7 +520,7 @@ module NextZ80
 								WE 		= opd[3] ? 6'b010001 : 6'b010010;			// PC, hi/lo
 								next_stage = 1;
 								REG_WSEL	= {1'b0, opd[5:4], 1'bx};
-								M1 		= 0;
+								int_m1 		= 0;
 							end
 							4'b01_0_0, 4'b01_1_0, 4'b10_0_1, 4'b11_1_1: begin		// r - stage2, (HL) - stage3, (X) - stage4
 								ALU160_SEL = 1;						// pc
@@ -499,14 +544,14 @@ module NextZ80
 								next_stage = 1;
 								REG_WSEL	= 4'b0111;					// tmpLO
 								REG_RSEL	= 4'b010x;					// HL
-								M1 		= 0;
-								WR			= 1;
+								int_m1 		= 0;
+								int_wr			= 1;
 							end
 							4'b00_1_1: begin							// (X) - stage1
 								ALU160_SEL = 1;						// pc
 								WE 		= 6'b010100;				// PC, tmpHI
 								next_stage = 1;
-								M1 		= 0;
+								int_m1 		= 0;
 							end
 						endcase
 //				-----------------------		rlca, rrca, rla, rra, daa, cpl, scf, ccf  --------------------						
@@ -539,7 +584,7 @@ module NextZ80
 							next_stage = 1;
 							REG_WSEL	= 4'b0101;				// L
 							REG_RSEL	= {op16, 1'b1};
-							M1 		= 0;
+							int_m1 		= 0;
 							MREQ		= 0;
 						end else begin
 							ALU160_SEL = 1;					// pc
@@ -587,7 +632,7 @@ module NextZ80
 						next_stage = 1;
 						REG_WSEL	= 4'b011x;		// A - tmpLO
 						REG_RSEL = 4'b010x;		// HL
-						M1 = 0;
+						int_m1 = 0;
 					end
 					5'b00_1_01,						// LD r, (X) 1st stage
 					5'b00_1_10:						// LD (X), r 1st stage
@@ -595,7 +640,7 @@ module NextZ80
 						ALU160_SEL = 1;			// pc
 						WE 		= 6'b010100;	// PC, tmpHI
 						next_stage = 1;
-						M1 		= 0;
+						int_m1 		= 0;
 					end
 					5'b00_0_10, 					// LD (HL), r 1st stage
 					5'b01_1_10:						// LD (X), r 2nd stage
@@ -607,8 +652,8 @@ module NextZ80
 						next_stage = 1;
 						REG_WSEL	= {1'b0, opd[2:0]};
 						REG_RSEL	= 4'b010x;		// HL
-						M1 		= 0;
-						WR			= 1;			
+						int_m1 		= 0;
+						int_wr			= 1;			
 					end
 					5'b01_0_10, 					// LD (HL), r 2nd stage
 					5'b10_1_10:						// LD (X), r 3rd stage
@@ -620,7 +665,7 @@ module NextZ80
 					end
 					5'b00_0_11, 5'b00_1_11: begin	// HALT
 						WE 		= 6'b000x00;	// no write
-						M1 		= 0;
+						int_m1 		= 0;
 						MREQ		= 0;
 						HALT 		= 1;	  
 						add_wait  = 3; // zek 4t
@@ -660,14 +705,14 @@ module NextZ80
 						next_stage = 1;
 						REG_WSEL	= 4'b011x;		// A-tmpLO
 						REG_RSEL	= 4'b010x;		// HL
-						M1 		= 0;
+						int_m1 		= 0;
 					end
 					4'b00_1_1:						// OP r, (X) 1st stage
 					begin
 						ALU160_SEL = 1;			// pc
 						WE 		= 6'b010100;	// PC, tmpHI
 						next_stage = 1;
-						M1 		= 0;
+						int_m1 		= 0;
 					end
 				endcase
 //------------------------------------------- block 11 ----------------------------------------------------
@@ -684,7 +729,7 @@ module NextZ80
 									next_stage = 1;
 									REG_WSEL	= 4'b111x;			// tmp16
 									REG_RSEL	= 4'b101x;			// SP
-									M1 		= 0;
+									int_m1 		= 0;
 								end else begin
 									ALU160_SEL = 1;				// pc
 									WE 		= 6'b010x00;		// PC	   
@@ -715,13 +760,13 @@ module NextZ80
 								DINW_SEL = 1;				// DI
 								next_stage = 1;
 								REG_RSEL	= 4'b101x;		// SP
-								M1 		= 0;
+								int_m1 		= 0;
 							end
 							2'b10: begin					// stage3
 								ALU160_SEL = 1;			// PC
 								WE 		= 6'b010x00;	// PC
 								
-								add_wait = 8; // zek 10t
+								add_wait = 7; // zek 10t
 							end
 						endcase
 //				-----------------------		JP cc --------------------
@@ -734,7 +779,7 @@ module NextZ80
 									WE 		= {4'b010x, STAGE[0] ? 1'b1 : 1'bx, !STAGE[0]};		// PC, hi/lo
 									next_stage = 1;
 									REG_WSEL	= 4'b111x;				// tmp7
-									M1 		= 0;
+									int_m1 		= 0;
 								end else begin
 									ALU160_SEL = 1;					// pc
 									WE 		= 6'b010x00;			// PC
@@ -762,7 +807,7 @@ module NextZ80
 										WE 		= {4'b010x, STAGE[0] ? 1'b1 : 1'bx, !STAGE[0]};		// PC, hi/lo
 										next_stage = 1;
 										REG_WSEL	= 4'b111x;				// tmp7
-										M1 		= 0;
+										int_m1 		= 0;
 									end
 									2'b10: begin						// stage3
 										ALU160_SEL = 0;					// regs
@@ -780,7 +825,7 @@ module NextZ80
 										WE 		= 6'b010x01;			// PC, lo
 										next_stage = 1;
 										REG_WSEL	= 4'b011x;				// tmpLO
-										M1 		= 0;
+										int_m1 		= 0;
 									end
 									2'b01: begin		// stage2 - OUT
 										DO_SEL	= 2'b00;					// ALU80
@@ -789,9 +834,9 @@ module NextZ80
 										next_stage = 1;
 										REG_WSEL	= 4'b0110;				// A
 										REG_RSEL	= 4'b011x;				// A-tmpLO
-										M1 		= 0;
+										int_m1 		= 0;
 										MREQ		= 0;
-										WR 		= 1;
+										int_wr 		= 1;
 										IORQ		= 1;
 									end
 									2'b10: begin		// stage3 - fetch
@@ -810,7 +855,7 @@ module NextZ80
 										next_stage = 1;
 										REG_WSEL	= 4'b111x;				// tmp16
 										REG_RSEL	= 4'b101x;				// SP
-										M1 		= 0;
+										int_m1 		= 0;
 									end
 									3'b010, 3'b011: begin			// stage3,4 - push hl
 										DO_SEL	= 2'b00;					// ALU80
@@ -820,8 +865,8 @@ module NextZ80
 										next_stage = 1;
 										REG_WSEL	= {3'b010, STAGE[0]};// H/L	
 										REG_RSEL	= 4'b101x;				// SP
-										M1 		= 0;
-										WR			= 1;
+										int_m1 		= 0;
+										int_wr			= 1;
 									end
 									3'b100, 3'b101: begin		// stage5,6
 										ALU160_SEL = 1;					// pc
@@ -831,7 +876,7 @@ module NextZ80
 										next_stage = !STAGE[0];
 										REG_WSEL	= 4'b010x;		// HL
 										REG_RSEL	= {3'b111, !STAGE[0]};		// tmp16
-										M1 		= STAGE[0];
+										int_m1 		= STAGE[0];
 										MREQ		= STAGE[0];
 										
 										add_wait = 13;  // zek 19t
@@ -856,7 +901,7 @@ module NextZ80
 									WE 		= {4'b010x, STAGE[0] ? 1'b1 : 1'bx, !STAGE[0]};		// PC, hi/lo
 									next_stage = 1;
 									REG_WSEL	= 4'b111x;				// tmp7
-									M1 		= 0;
+									int_m1 		= 0;
 								end else begin
 									ALU160_SEL = 1;					// pc
 									WE 		= 6'b010x00;			// PC
@@ -872,8 +917,8 @@ module NextZ80
 								next_stage = 1;
 								REG_WSEL	= 4'b1xxx;				// pc
 								REG_RSEL	= 4'b101x;				// sp
-								M1 		= 0;
-								WR			= 1;
+								int_m1 		= 0;
+								int_wr			= 1;
 							end
 							3'b100:	begin	// stage5
 								ALU160_SEL = 0;					// regs
@@ -894,8 +939,8 @@ module NextZ80
 								next_stage = 1;
 								REG_WSEL	= {1'b0, FETCH[5:4], STAGE[0]};
 								REG_RSEL	= 4'b101x;				// SP
-								M1 		= 0;
-								WR			= 1;
+								int_m1 		= 0;
+								int_wr			= 1;
 							end
 							2'b10: begin					//stage3
 								ALU160_SEL = 1;				// PC
@@ -912,7 +957,7 @@ module NextZ80
 							WE 		= 6'b010x01;			// PC, lo
 							next_stage = 1;
 							REG_WSEL	= 4'b011x;				// tmpLO
-							M1 		= 0;
+							int_m1 		= 0;
 						end else begin					// stage 2
 							DINW_SEL = 0;						// ALU8OUT[7:0]
 							ALU160_SEL = 1;					// pc
@@ -934,8 +979,8 @@ module NextZ80
 								next_stage = 1;
 								REG_WSEL	= 4'b1xxx;				// pc
 								REG_RSEL	= 4'b101x;				// sp
-								M1 		= 0;
-								WR			= 1;
+								int_m1 		= 0;
+								int_wr			= 1;
 							end
 							2'b10:	begin				// stage3
 								ALU160_SEL = 0;					// regs
@@ -957,14 +1002,14 @@ module NextZ80
 										next_stage = 1;
 										REG_WSEL	= 4'b111x;			// tmp16
 										REG_RSEL	= 4'b101x;			// SP
-										M1 		= 0;
+										int_m1 		= 0;
 									end		
 									2'b10: begin			// stage3 - jump
 										ALU160_SEL = 0;					// regs
 										WE 		= 6'b010x00;			// PC
 										REG_RSEL	= 4'b111x;				// tmp16 
 										
-										add_wait = 7; //zek 10t
+										add_wait = 8; //zek 10t
 									end
 								endcase
 							2'b01: begin			// EXX
@@ -988,7 +1033,7 @@ module NextZ80
 									ALU16OP	= 4;					// NOP, no post inc
 									next_stage = 1;
 									REG_RSEL	= 4'b010x;			// HL
-									M1 		= 0;
+									int_m1 		= 0;
 									MREQ		= 0;
 								end else begin						// stage2
 									ALU160_SEL = 1;				// pc
@@ -1014,7 +1059,7 @@ module NextZ80
 										ALU160_SEL = 1;			// PC
 										WE 		= 6'b010100;	// PC, tmpHI
 										next_stage = 1;
-										M1 		= 0;
+										int_m1 		= 0;
 									end
 								endcase
 							2'b01:					// IN A, (n)
@@ -1025,7 +1070,7 @@ module NextZ80
 										WE 		= 6'b010x01;		// PC, lo
 										next_stage = 1;
 										REG_WSEL	= 4'b011x;			// tmpLO
-										M1 		= 0;
+										int_m1 		= 0;
 									end
 									2'b01: begin		// stage2 - IN
 										ALU160_SEL = 0;				// regs
@@ -1034,7 +1079,7 @@ module NextZ80
 										next_stage = 1;
 										REG_WSEL	= 4'b011x;			// A
 										REG_RSEL	= 4'b011x;			// A - tmpLO
-										M1 		= 0;
+										int_m1 		= 0;
 										MREQ		= 0;
 										IORQ		= 1;
 									end
@@ -1073,7 +1118,7 @@ module NextZ80
 										WE 		= {4'b010x, STAGE[0] ? 1'b1 : 1'bx, !STAGE[0]};		// PC, hi/lo
 										next_stage = 1;
 										REG_WSEL	= 4'b111x;				// tmp7
-										M1 		= 0;
+										int_m1 		= 0;
 									end
 									3'b010, 3'b011: begin		// stage 3,4 - push pc
 										DO_SEL	= {1'b0, STAGE[0]};	// pc hi/lo
@@ -1083,8 +1128,8 @@ module NextZ80
 										next_stage = 1;
 										REG_WSEL	= 4'b1xxx;				// pc
 										REG_RSEL	= 4'b101x;				// sp
-										M1 		= 0;
-										WR			= 1;
+										int_m1 		= 0;
+										int_wr			= 1;
 									end
 									3'b100:	begin	// stage5 - jump
 										ALU160_SEL = 0;					// regs
@@ -1136,7 +1181,7 @@ module NextZ80
 							next_stage = 1;
 							REG_WSEL	= {1'b0, opd[5:4], 1'bx};
 							REG_RSEL	= 4'b000x;				// BC
-							M1 		= 0;
+							int_m1 		= 0;
 							MREQ		= 0;
 							IORQ 		= 1;
 						end else begin
@@ -1156,9 +1201,9 @@ module NextZ80
 							next_stage = 1;
 							REG_WSEL	= &opd[5:3] ? 4'b110x : {1'b0, opd[5:3]}; // zero/reg
 							REG_RSEL	= 4'b000x;				// BC
-							M1 		= 0;
+							int_m1 		= 0;
 							MREQ		= 0;
-							WR			= 1;
+							int_wr			= 1;
 							IORQ 		= 1;
 						end else begin
 							ALU160_SEL = 1;					// pc
@@ -1175,7 +1220,7 @@ module NextZ80
 							next_stage = 1;
 							REG_WSEL	= 4'b0101;				// L			
 							REG_RSEL	= {op16, 1'b1};
-							M1 		= 0;
+							int_m1 		= 0;
 							MREQ		= 0;
 						end else begin
 							ALU160_SEL = 1;					// pc
@@ -1196,7 +1241,7 @@ module NextZ80
 								WE 		= {4'b010x, STAGE[0] ? 1'b1 : 1'bx, !STAGE[0]};	// PC, hi/lo
 								next_stage = 1;
 								REG_WSEL	= 4'b111x;			// tmp16
-								M1 		= 0;
+								int_m1 		= 0;
 							end
 							2'b01: begin
 								ALU160_SEL = 0;			// regs
@@ -1204,14 +1249,14 @@ module NextZ80
 								ALU16OP	= {2'b00, STAGE[0]};				
 								REG_RSEL	= 4'b111x;		// tmp16
 								REG_WSEL	= {op16, !STAGE[0]};
-								M1 		= 0;
+								int_m1 		= 0;
 								if(FETCH[3]) begin	// LD rr, (nn) - stage3,4
 									DINW_SEL = 1;				// DI
 									WE 		= {4'b000x, STAGE[0] ? 1'b1 : 1'bx, !STAGE[0]};	// lo
 								end else begin			// LD (nn), rr - stage3,4
 									DO_SEL	= op16[2] ? {1'b1, !STAGE[0]} : 2'b00;				// ALU80/sp
 									WE 		= 6'b000x00;		// nothing
-									WR			= 1;
+									int_wr			= 1;
 								end
 							end
 							2'b10:		// stage5 
@@ -1221,7 +1266,7 @@ module NextZ80
 									ALU16OP	= 4;						// NOP
 									next_stage = 1;
 									REG_RSEL	= 4'b101x;				// tmp SP
-									M1 		= 0;
+									int_m1 		= 0;
 									MREQ		= 0;
 								end else begin
 									ALU160_SEL = 1;					// pc
@@ -1251,7 +1296,7 @@ module NextZ80
 								next_stage = 1;
 								REG_WSEL	= 4'b111x;			// tmp16
 								REG_RSEL	= 4'b101x;			// SP
-								M1 		= 0;
+								int_m1 		= 0;
 							end		
 							2'b10: begin			// stage3 - jump
 								ALU160_SEL = 0;					// regs
@@ -1303,7 +1348,7 @@ module NextZ80
 										next_stage = 1;
 										REG_WSEL	= 4'b011x;				// tmpLO
 										REG_RSEL	= 4'b010x;				// HL
-										M1 		= 0;
+										int_m1 		= 0;
 									end
 									2'b01: begin	// stage2, shift data
 										DINW_SEL = 0;						// ALU8OUT
@@ -1312,7 +1357,7 @@ module NextZ80
 										next_stage = 1;
 										REG_WSEL	= 4'b0110;				// A
 										REG_RSEL	= 4'b0111;				// tmpLO
-										M1 		= 0;
+										int_m1 		= 0;
 										MREQ		= 0;
 									end
 									2'b10: begin // stage3 - write
@@ -1322,8 +1367,8 @@ module NextZ80
 										next_stage = 1;
 										REG_WSEL	= 4'b0111;				// tmpLO
 										REG_RSEL	= 4'b010x;				// HL
-										M1 		= 0;
-										WR			= 1;
+										int_m1 		= 0;
+										int_wr			= 1;
 									end
 									2'b11: begin
 										ALU160_SEL = 1;					// PC
@@ -1344,7 +1389,9 @@ module NextZ80
 			4'b0110:
 				if({FETCH[5], FETCH[2]} == 4'b10)
 					case(FETCH[1:0])
-						2'b00:	// LDI, LDD, LDIR, LDDR
+						2'b00:	// LDI, LDD, LDIR, LDDR	  
+						begin
+							BLOCK = 1;
 							case(STAGE[1:0])
 								2'b00:	begin			// stage1, read data, inc/dec HL
 									ALU160_SEL = 0;					// regs
@@ -1354,16 +1401,17 @@ module NextZ80
 									next_stage = 1;
 									REG_WSEL	= 4'b0100;				// H
 									REG_RSEL	= 4'b0101;				// L
-									M1 		= 0;
+									int_m1 		= 0;
 								end
-								2'b01:	begin			// stage2, dec BC
+								2'b01:	begin			// stage2, dec BC		   
+									//ALU160_SEL = 0;	//zek
 									DINW_SEL = 0;						// ALU8OUT
 									WE 		= 6'b100011;			// flags, hi, lo (affects PF only)
 									ALU8OP	= 5'b01111;				// DEC
 									next_stage = 1;
 									REG_WSEL	= 4'b0000;				// B
 									REG_RSEL	= 4'b0001;				// C
-									M1 		= 0;
+									int_m1 		= 0;
 									MREQ		= 0;
 								end
 								2'b10:	begin			// stage2, write data, inc/dec DE
@@ -1375,10 +1423,10 @@ module NextZ80
 									next_stage = FETCH[4] ? !FLAGS[2] : 1'b1;
 									REG_WSEL	= 4'b0010;				// D
 									REG_RSEL	= 4'b0011;				// E
-									M1 		= 0;
-									WR			= 1;
+									int_m1 		= 0;
+									int_wr			= 1;
 									
-									add_wait = 14; //zek 17t (21t-4t pref)
+									add_wait = next_stage ? 0 : 18; //zek 21t (21t pref)
 								end
 								2'b11: begin
 									ALU160_SEL = 1;					// PC
@@ -1386,7 +1434,8 @@ module NextZ80
 									
 									add_wait = 8; //zek 12t(16t-4t pref)
 								end
-							endcase
+							endcase	  
+						end
 						2'b01:	// CPI, CPD, CPIR, CPDR
 							case(STAGE[1:0])
 								2'b00: begin			// stage1, load data
@@ -1396,7 +1445,7 @@ module NextZ80
 									next_stage = 1;
 									REG_WSEL	= 4'b011x;				// tmpLO
 									REG_RSEL	= 4'b010x;				// HL
-									M1 		= 0;
+									int_m1 		= 0;
 								end
 								2'b01: begin			// stage2, CP
 									WE 		= 6'b100x0x;			// flags
@@ -1404,7 +1453,7 @@ module NextZ80
 									next_stage = 1;
 									REG_WSEL	= 4'b0110;				// A
 									REG_RSEL	= 4'b0111;				// tmpLO
-									M1 		= 0;
+									int_m1 		= 0;
 									MREQ		= 0;
 								end
 								2'b10: begin			// stage3, dec BC
@@ -1414,20 +1463,20 @@ module NextZ80
 									next_stage = 1;
 									REG_WSEL	= 4'b0000;				// B
 									REG_RSEL	= 4'b0001;				// C
-									M1 		= 0;
+									int_m1 		= 0;
 									MREQ		= 0;
 								end
 								2'b11: begin			// stage4, inc/dec HL
 									ALU160_SEL = 1;					// pc
 									DINW_SEL = 0;						// ALU8OUT
-									M1 		= FETCH[4] ? (!FLAGS[2] || FLAGS[6]) : 1'b1;
-									WE 		= {1'b0, M1, 4'b0x11};	// PC, hi, lo
+									int_m1 		= FETCH[4] ? (!FLAGS[2] || FLAGS[6]) : 1'b1;
+									WE 		= {1'b0, int_m1, 4'b0x11};	// PC, hi, lo
 									ALU8OP	= {4'b0111, FETCH[3]};	// INC / DEC
 									REG_WSEL	= 4'b0100;				// H
 									REG_RSEL	= 4'b0101;				// L
-									MREQ		= M1;		
+									MREQ		= int_m1;		
 									
-									add_wait = M1 ? 13:8; //zek 17t(21t-4t pref)|12t(16t-4t pref)
+									add_wait = int_m1 ? 13:8; //zek 17t(21t-4t pref)|12t(16t-4t pref)
 								end
 							endcase
 						2'b10:	// INI, IND, INIR, INDR
@@ -1440,7 +1489,7 @@ module NextZ80
 									next_stage = 1;
 									REG_WSEL	= 4'b0000;				// B
 									REG_RSEL	= 4'b000x;				// BC
-									M1 		= 0;
+									int_m1 		= 0;
 									MREQ		= 0;
 									IORQ		= 1;
 								end
@@ -1453,8 +1502,8 @@ module NextZ80
 									next_stage = FETCH[4] ? FLAGS[6] : 1'b1;
 									REG_WSEL	= 4'b0100;				// H
 									REG_RSEL	= 4'b0101;				// L
-									M1 		= 0;
-									WR			= 1;		
+									int_m1 		= 0;
+									int_wr			= 1;		
 									
 									add_wait =  9; //zek 11t(16t-4t pref-1t write)
 								end
@@ -1475,7 +1524,7 @@ module NextZ80
 									next_stage = 1;
 									REG_WSEL	= 4'b0100;				// H
 									REG_RSEL	= 4'b0101;				// L
-									M1 		= 0;
+									int_m1 		= 0;
 								end
 								2'b01: 	begin			// stage2, out data, dec B
 									DO_SEL	= 2'b01;					// th
@@ -1486,10 +1535,10 @@ module NextZ80
 									next_stage = FETCH[4] ? (ALU80 == 8'b00000001) : 1'b1;
 									REG_WSEL	= 4'b0000;				// B
 									REG_RSEL	= 4'b000x;				// BC
-									M1 		= 0;
+									int_m1 		= 0;
 									MREQ		= 0;
 									IORQ		= 1;
-									WR			= 1;  
+									int_wr			= 1;  
 									
 									add_wait =  9; //zek 11t(16t-4t pref-1t write)
 								end
@@ -1527,7 +1576,7 @@ module NextZ80
 						next_stage = 1;
 						REG_WSEL = FETCH[7:6] == 2'b01 ? 4'b111x : {1'b0, opd[2:0]};	// dest, tmp16 for BIT
 						REG_RSEL	= 4'b010x;			// HL
-						M1 		= 0;
+						int_m1 		= 0;
 					end
 					4'b01_0_1, 4'b01_1_0, 4'b01_1_1:		// stage2 (HL-X) - execute, write
 						case(FETCH[7:6])
@@ -1541,8 +1590,8 @@ module NextZ80
 								next_stage = 1;
 								REG_WSEL	= {1'b0, opd[2:0]};
 								REG_RSEL	= 4'b010x;				// HL
-								M1 		= 0;
-								WR			= 1;
+								int_m1 		= 0;
+								int_wr			= 1;
 							end
 							2'b01: begin							// BIT, no write
 								ALU160_SEL = 1;					// pc
@@ -1569,7 +1618,7 @@ module NextZ80
 					ALU16OP	= 4;						// NOP
 					REG_WSEL	= 4'b010x;				// IR
 					REG_RSEL	= 4'b110x;				// const
-					M1 		= 0;
+					int_m1 		= 0;
 					MREQ		= 0;
 					status[11:6] = 6'b110000;		// IM0, DI
 				end 
@@ -1580,7 +1629,7 @@ module NextZ80
 						WE 		= 6'b010x00;		// PC
 						ALU16OP	= intop;				// DEC/DEC2 (if block instruction interrupted)
 						next_stage = 1;
-						M1 		= 0;
+						int_m1 		= 0;
 						MREQ		= 0;
 					end
 					2'b01, 2'b10: begin
@@ -1591,8 +1640,8 @@ module NextZ80
 						next_stage = 1;
 						REG_WSEL	= 4'b1xxx;				// pc
 						REG_RSEL	= 4'b101x;				// sp
-						M1 		= 0;
-						WR			= 1;
+						int_m1 		= 0;
+						int_wr			= 1;
 						status[11]	= 1'b1;
 						status[7:6] = {CPUStatus[7], 1'b0};	// reset IFF1
 					end
@@ -1637,8 +1686,8 @@ module NextZ80
 								next_stage = 1;
 								REG_WSEL	= 4'b1xxx;				// pc
 								REG_RSEL	= 4'b101x;				// sp
-								M1 		= 0;
-								WR			= 1;
+								int_m1 		= 0;
+								int_wr			= 1;
 							end
 							3'b011, 3'b100:	begin			// read address
 								ALU160_SEL = 0;					// regs
@@ -1648,7 +1697,7 @@ module NextZ80
 								next_stage = 1;
 								REG_WSEL	= 4'b111x;				// tmp16
 								REG_RSEL	= 4'b1000;				// I-Itmp
-								M1 		= 0;
+								int_m1 		= 0;
 							end
 							3'b101: begin						// jump
 								ALU160_SEL = 0;					// regs
@@ -1659,7 +1708,10 @@ module NextZ80
 							end
 						endcase
 				endcase
-		endcase	
+		endcase		   
+		
+		if (res_stall | RESET)
+			add_wait = 0;
 	end
 
 endmodule

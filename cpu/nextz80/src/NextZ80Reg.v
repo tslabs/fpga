@@ -87,14 +87,20 @@ module Z80Reg(
 	
 	always @ (posedge CLK)	  
 	begin
-		if (WE[0] & !WAIT) #1 REGL[SELW] = DIN[7:0];
-		if (WE[1] & !WAIT) #1 REGH[SELW] = DIN[15:8];
+		if (WE[0] & !WAIT) REGL[SELW] = DIN[7:0];
+		if (WE[1] & !WAIT) REGH[SELW] = DIN[15:8];
 	end
 	
 	assign rdow = { REGH[SELW], REGL[SELW]};
 	assign rdor = { REGH[SELR], REGL[SELR]};	
 	
-	initial
+	//[3:1] 0=BC, 1=DE, 2=HL, 3=A-TL, 4=I-x 
+	
+	wire	R_BC = {REGH[0], REGL[0]};
+	wire	R_DE = {REGH[1], REGL[1]};
+	wire	R_HL = {REGH[2], REGL[2]};
+	
+	/*initial
 	begin
 		{REGH[0],  REGL[0]} = 0;	
 		{REGH[1],  REGL[1]} = 0;
@@ -112,7 +118,7 @@ module Z80Reg(
 		{REGH[13], REGL[13]} = 0;
 		{REGH[14], REGL[14]} = 0;
 		{REGH[15], REGL[15]} = 0;
-	end
+	end	*/
 	
 	
 	wire [15:0]ADDR1 = ADDR + !ALU16OP[2]; // address post increment
@@ -134,10 +140,22 @@ module Z80Reg(
 	
 	always @* begin
 		DIN = DINW_SEL ? {DI, DI} : ALU8OUT;
+			
+		casex({ALU16OP == 4, REG_RSEL[3:0]})
+			5'b01001, 5'b11001:	
+				mux_rdor = {rdor[15:8], r};
+			5'b01010, 5'b01011:
+				mux_rdor = sp;
+			5'b01100, 5'b01101, 5'b11100, 5'b11101:	
+				mux_rdor = {8'b0, CONST};
+			default:
+				mux_rdor = rdor;
+		endcase
+		
 		ALU80 = REG_WSEL[0] ? rdow[7:0] : rdow[15:8];
-		ALU81 = REG_RSEL[0] ? mux_rdor[7:0] : mux_rdor[15:8];
+		ALU81 = REG_RSEL[0] ? mux_rdor[7:0] : mux_rdor[15:8];	
 		ALU160 = ALU160_sel ? pc : mux_rdor;
-	
+		
 		case({REG_WSEL[3], DO_SEL})
 			0:	DO = ALU80;
 			1:	DO = th;
@@ -147,12 +165,6 @@ module Z80Reg(
 			5: DO = pc[7:0];
 			6:	DO = sp[15:8];
 			7: DO = sp[7:0];
-		endcase
-		case({ALU16OP == 4, REG_RSEL[3:0]})
-			5'b01001, 5'b11001:								mux_rdor = {rdor[15:8], r};
-			5'b01010, 5'b01011: 								mux_rdor = sp;
-			5'b01100, 5'b01101, 5'b11100, 5'b11101:	mux_rdor = {8'b0, CONST};
-			default:		mux_rdor = rdor;
 		endcase 
 	end
 	
