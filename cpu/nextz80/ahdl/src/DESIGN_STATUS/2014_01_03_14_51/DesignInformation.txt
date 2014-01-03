@@ -1,0 +1,75 @@
+-------------------------------------------------------------------------------
+--
+-- Title      : Design Flow Manager settings and simulation libraries
+-- Active-HDL : 9.1.2353.4205.02 
+-- Workspace  : NZ80
+-- Design     : NextZ80
+-- Author     : demya_000
+-- Company    : ts
+-- Date       : 2014-01-03 14:51:30
+--
+-------------------------------------------------------------------------------
+1. Design Flow Manager Settings
+-----------------------------
+Language           | VERILOG
+Flow Type          | HDL
+C Synthesis        | <none>  
+HDL Synthesis      | <none>  
+Physical Synthesis | <none>  
+Implementation     | <none>  
+Family Name        | <none>
+-----------------------------
+
+2. Working Library: NextZ80
+Active-HDL 9.1.2353.4205  2014-01-03 13:05:03
+
+Elaboration top modules:
+Verilog Module                TB
+
+
+-------------------------------------------------------------------------------------------
+Entity    | Architecture | Library | Info | Compiler Version         | Compilation Options
+-------------------------------------------------------------------------------------------
+T80s      | rtl          | nextz80 |      | 9.1.2353.4205  (Windows) | -O3
+T80       | rtl          | nextz80 |      | 9.1.2353.4205  (Windows) | -O3
+T80_MCode | rtl          | nextz80 |      | 9.1.2353.4205  (Windows) | -O3
+T80_ALU   | rtl          | nextz80 |      | 9.1.2353.4205  (Windows) | -O3
+T80_Reg   | rtl          | nextz80 |      | 9.1.2353.4205  (Windows) | -O3
+-------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------
+Verilog Module           | Library | Info | Compiler Version         | Compilation Options
+-------------------------------------------------------------------------------------------
+TB                       | nextz80 |      | 9.1.2353.4205  (Windows) | -l nextz80 -O3
+ssram                    | nextz80 |      | 9.1.2353.4205  (Windows) | -l nextz80 -O3
+NextZ80                  | nextz80 |      | 9.1.2353.4205  (Windows) | -l nextz80 -O3
+Z80Reg                   | nextz80 |      | 9.1.2353.4205  (Windows) | -l nextz80 -O3
+ALU8                     | nextz80 |      | 9.1.2353.4205  (Windows) | -l nextz80 -O3
+ALU16                    | nextz80 |      | 9.1.2353.4205  (Windows) | -l nextz80 -O3
+RegSelect                | nextz80 |      | 9.1.2353.4205  (Windows) | -l nextz80 -O3
+daa                      | nextz80 |      | 9.1.2353.4205  (Windows) | -l nextz80 -O3
+-------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------
+VHDL Package             | Library | Info | Compiler Version         | Compilation Options
+-------------------------------------------------------------------------------------------
+standard                 | std     |      |                          | <unavailable>
+TEXTIO                   | std     |      | 9.1.2353.4205  (Windows) |  -2008
+std_logic_1164           | ieee    |      | 9.1.2353.4205  (Windows) |  -2008
+NUMERIC_STD              | ieee    |      | 9.1.2353.4205  (Windows) |  -2008
+T80_Pack                 | nextz80 |      | 9.1.2353.4205  (Windows) | -O3
+-------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------
+Library                  | Comment
+-------------------------------------------------------------------------------------------
+ieee                     | Standard IEEE packages library
+nextz80                  | None
+std                      | Standard VHDL library
+-------------------------------------------------------------------------------------------
+
+
+Simulation Options: asim +no_tchk_msg -ieee_nowarn -O5 +access +r +m+TB TB
+
+
+

@@ -1,0 +1,29 @@
+-------------------------------------------------------------------------------
+--
+-- Title      : List of local and global libraries visible in Library Manager
+-- Active-HDL : 9.1.2353.4205.02 
+-- Workspace  : NZ80
+-- Design     : NextZ80
+-- Author     : demya_000
+-- Company    : ts
+-- Date       : 2014-01-03 14:51:30
+--
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Library       | Mode  | Vendor   | Version                                          | Comment
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+aldec         | RO    | ALDEC    | Aldec Active-HDL                                 | VHDL PROCEDURES FOR CALLING ASDB, FSDB, MATLAB, SIGNAL AGENT TASKS FROM THE VHDL CODE, RANDOM PACKAGE
+exemplar      | RO    | MENTOR   | MENTOR GRAPHICS PRECISION RTL SYNTHESIS 2011a.61 | EXEMPLAR VHDL LIBRARY.
+vtl           | RO    | No Data  | No Data                                          | No Data
+synopsys      | RO    | No Data  | No Data                                          | Library containing packages with useful functions for std_logic types objects
+std           | RO    | No Data  | No Data                                          | Standard VHDL library
+assertions    | RO    | No Data  | No Data                                          | No Data
+nextz80       | RW    | No Data  | No Data                                          | No Data
+ieee          | RO    | No Data  | No Data                                          | Standard IEEE packages library
+vtl_dbg       | RO    | No Data  | No Data                                          | No Data
+ieee_proposed | RO    | No Data  | No Data                                          | VHDL '93 compatible version of the proposed packages for the IEEE 1076-2008 standard
+vl            | RO    | No Data  | No Data                                          | Standard Verilog library
+vital2000     | RO    | No Data  | No Data                                          | Standard IEEE packages library
+synplify      | RO    | SYNOPSYS | SYNOPSYS FPGA PRODUCTS F-2011.09-SP1             | SYNPLIFY VHDL LIBRARY
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+

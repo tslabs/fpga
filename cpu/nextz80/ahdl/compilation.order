@@ -1,0 +1,13 @@
+.\src\TB.v
+.\src\NextZ80\NextZ80ALU.v
+.\src\NextZ80\NextZ80CPU.v
+.\src\NextZ80\NextZ80Reg.v
+.\src\T80\T80_Reg.vhd
+.\src\T80\T80_ALU.vhd
+.\src\T80\T80_MCode.vhd
+.\src\T80\T80_Pack.vhd
+.\src\T80\T80.vhd
+.\src\T80\T80s.vhd
+.\src\Libs\ROM.v
+.\src\Libs\ssram.v
+.\src\Libs\RAM16X1D.v

@@ -1,0 +1,34 @@
+-------------------------------------------------------------------------------
+--
+-- Title      : List of design files displayed in Active-HDL Design Browser
+-- Active-HDL : 9.1.2353.4205.02 
+-- Workspace  : NZ80
+-- Design     : NextZ80
+-- Author     : demya_000
+-- Company    : ts
+-- Date       : 2014-01-03 14:51:30
+--
+-------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------------------------
+File          | Comp. | File Status | Design Folder | File Path
+              | Order |             |               |
+--------------------------------------------------------------------------------------------------
+TB.v          |     1 | Modified    |               | c:\My_Designs\Dev\NextZ80\src\TB.v
+NextZ80ALU.v  |     2 | Compiled    | NextZ80       | c:\My_Designs\Dev\NextZ80\src\NextZ80\NextZ80ALU.v
+NextZ80CPU.v  |     3 | Modified    | NextZ80       | c:\My_Designs\Dev\NextZ80\src\NextZ80\NextZ80CPU.v
+NextZ80Reg.v  |     4 | Modified    | NextZ80       | c:\My_Designs\Dev\NextZ80\src\NextZ80\NextZ80Reg.v
+T80_Reg.vhd   |     5 | Compiled    | T80           | c:\My_Designs\Dev\NextZ80\src\T80\T80_Reg.vhd
+T80_ALU.vhd   |     6 | Compiled    | T80           | c:\My_Designs\Dev\NextZ80\src\T80\T80_ALU.vhd
+T80_MCode.vhd |     7 | Compiled    | T80           | c:\My_Designs\Dev\NextZ80\src\T80\T80_MCode.vhd
+T80_Pack.vhd  |     8 | Compiled    | T80           | c:\My_Designs\Dev\NextZ80\src\T80\T80_Pack.vhd
+T80.vhd       |    10 | Compiled    | T80           | c:\My_Designs\Dev\NextZ80\src\T80\T80.vhd
+T80a.vhd      |       | Modified    | T80           | c:\My_Designs\Dev\NextZ80\src\T80\T80a.vhd
+T80s.vhd      |    11 | Compiled    | T80           | c:\My_Designs\Dev\NextZ80\src\T80\T80s.vhd
+T80_RegX.vhd  |       | Compiled    | T80           | c:\My_Designs\Dev\NextZ80\src\T80\T80_RegX.vhd
+T80se.vhd     |       | Compiled    | T80           | c:\My_Designs\Dev\NextZ80\src\T80\T80se.vhd
+ROM.v         |    12 | Compiled    | Libs          | c:\My_Designs\Dev\NextZ80\src\Libs\ROM.v
+ssram.v       |    13 | Modified    | Libs          | c:\My_Designs\Dev\NextZ80\src\Libs\ssram.v
+RAM16X1D.v    |    14 | Compiled    | Libs          | c:\My_Designs\Dev\NextZ80\src\Libs\RAM16X1D.v
+--------------------------------------------------------------------------------------------------
+
