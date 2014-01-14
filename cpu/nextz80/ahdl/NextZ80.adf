@@ -97,8 +97,6 @@ Selected=
 NextZ80=1
 T80=1
 Libs=1
-DESIGN_STATUS=1
-DESIGN_STATUS\2014_01_03_14_51=1
 
 [sdf.vm.TB]
 SdfNoWarn=0
@@ -212,6 +210,8 @@ CollectDataForAll=0
 
 [Files]
 /TB.v=-1
+/untitled.asdb=-1
+/untitled.awc=-1
 NextZ80/NextZ80ALU.v=-1
 NextZ80/NextZ80CPU.v=-1
 NextZ80/NextZ80Reg.v=-1
@@ -227,13 +227,11 @@ T80/T80se.vhd=-1
 Libs/ROM.v=-1
 Libs/ssram.v=-1
 Libs/RAM16X1D.v=-1
-DESIGN_STATUS\2014_01_03_14_51/ComputerInformation.txt=-1
-DESIGN_STATUS\2014_01_03_14_51/DesignInformation.txt=-1
-DESIGN_STATUS\2014_01_03_14_51/DesignFiles.txt=-1
-DESIGN_STATUS\2014_01_03_14_51/LibrariesList.txt=-1
 
 [Files.Data]
 .\src\TB.v=Verilog Source Code
+.\src\untitled.asdb=Accelerated Waveform File
+.\src\untitled.awc=Accelerated Waveform Configuration
 .\src\NextZ80\NextZ80ALU.v=Verilog Source Code
 .\src\NextZ80\NextZ80CPU.v=Verilog Source Code
 .\src\NextZ80\NextZ80Reg.v=Verilog Source Code
@@ -249,8 +247,3 @@ DESIGN_STATUS\2014_01_03_14_51/LibrariesList.txt=-1
 .\src\Libs\ROM.v=Verilog Source Code
 .\src\Libs\ssram.v=Verilog Source Code
 .\src\Libs\RAM16X1D.v=Verilog Source Code
-.\src\DESIGN_STATUS\2014_01_03_14_51\ComputerInformation.txt=Text File
-.\src\DESIGN_STATUS\2014_01_03_14_51\DesignInformation.txt=Text File
-.\src\DESIGN_STATUS\2014_01_03_14_51\DesignFiles.txt=Text File
-.\src\DESIGN_STATUS\2014_01_03_14_51\LibrariesList.txt=Text File
-

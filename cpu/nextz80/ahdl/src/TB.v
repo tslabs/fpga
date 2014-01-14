@@ -4,7 +4,8 @@
 module TB();
 
 reg CLK = 0;
-reg RES = 0;
+reg RES = 0;			  
+reg [15:0]	CCNT = 0;
 
 always #10 CLK = ~CLK;
 
@@ -14,7 +15,14 @@ begin
 	RES = 1;
 	#100
 	RES = 0;
-end
+end					 
+
+always @ (posedge CLK)
+	if (RES)
+		CCNT = 0;
+	else
+		CCNT = CCNT + 1;
+	
 
 // NextZ80	******************************************************************************************************************************	
 
@@ -28,10 +36,11 @@ wire [7:0]	ram0_do, rom0_do;
 
 assign		nz80_di = nz80_addr[15] ? ram0_do : rom0_do;
 
-
 localparam
 	H = 1'b1,
-	L = 1'b0;
+	L = 1'b0;			 
+	
+wire	FMODE = 1'b1;
 
 ssram ram0(
 	.CLK(CLK),
@@ -58,12 +67,12 @@ NextZ80	nz80 (
 	.M1(nz80_m1),
 	.CLK(NZ80CLK),
 	.RESET(RES),
-	.STALL(nz80_stall),
+	.FASTMODE(FMODE),
 	
 	.BLOCK(BLOCK),
 	
 	.INT(L), .NMI(L), .WAIT(L)
-);
+);					  
 
 // T80	 ******************************************************************************************************************************
 
@@ -136,7 +145,7 @@ begin
 		if (nz80_fa==t80_fa);
 		else		
 		begin		  
-			if (stop_cnt == 0 && !BLOCK)
+			if (stop_cnt == 0 && !BLOCK && FMODE == 0) 
 			begin
 				$display("*** ÊÎÃÍÈÒÈÂÍÛÉ ÄÈÑÑÎÍÀÍÑ ***");
 				$display("NEXTZ80 ADDR=%h  T80 ADDR=%h", nz80_fa, t80_fa);  
@@ -148,7 +157,7 @@ begin
 	if (stop_cnt > 0)
 		stop_cnt = stop_cnt - 1;
 		
-	if (stop_cnt == 1)
+	if (stop_cnt == 1 && FMODE == 0)
 	begin
 		$display("*** STOP ***");
 		$finish;
