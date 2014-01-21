@@ -1,4 +1,5 @@
-module 	sxga(
+module 	sxga
+(
 
 	input  wire	        clk,
 	output reg	[7:0]	r,
@@ -17,11 +18,11 @@ module 	sxga(
 	input  wire	[3:0]	key
 );
 
-
 //	|...front...|...sync...|...back...|...visible...|
 //	|....48.....|...112....|...248....|....1280.....|	hor
 //	|.....1.....|.....3....|....38....|....1024.....|	ver
 
+	// SXGA 1280x1024
 	localparam HSYNC    = 11'd48;		// start of Horizontal Sync
 	localparam HBACK    = 11'd160;		// start of Horizontal Back Porch
 	localparam HVISIBLE = 11'd408;		// start of Horizontal Pixels
@@ -32,7 +33,16 @@ module 	sxga(
 	localparam VVISIBLE = 11'd42;		// start of Vertical Pixels
     localparam VTOTAL   = 11'd1066;		// total number of line per frame
 
-	
+	// VGA 768x576
+	// localparam HSYNC    = 11'd32;		// start of Horizontal Sync
+	// localparam HBACK    = 11'd112;		// start of Horizontal Back Porch
+	// localparam HVISIBLE = 11'd224;		// start of Horizontal Pixels
+	// localparam HTOTAL   = 11'd992;		// total number of tacts per line
+		
+	// localparam VSYNC    = 11'd1;		// start of Vertical Sync
+	// localparam VBACK    = 11'd4;		// start of Vertical Back Porch
+	// localparam VVISIBLE = 11'd25;		// start of Vertical Pixels
+    // localparam VTOTAL   = 11'd601;		// total number of line per frame
 	
 	wire hss = (hcnt == (HSYNC - 1));            	// hsync start trigger
 	wire hse = (hcnt == (HBACK - 1));            	// hsync end trigger
@@ -44,7 +54,6 @@ module 	sxga(
 	wire vse = (vcnt == (VBACK - 1));             	// vsync end trigger
 	wire vvs = (vcnt == (VVISIBLE - 1));          	// vertical pixels area start trigger
 	wire eof = (vcnt == (VTOTAL - 1));            	// end of frame trigger
-
 	
 // horizontal part
 	reg	[10:0]	hcnt;
@@ -69,7 +78,6 @@ module 	sxga(
 			hfetch <= 0;
         
 	end
-
 
 // vertical part
 	reg	[10:0]	vcnt;
@@ -97,7 +105,6 @@ module 	sxga(
 
 		end
 	end
-
 
 // Bitmap walking
 	reg  [20:0]	bitmap_x;							// These are 9.12 (= 512x512 with 12 bits for fractal part)
@@ -137,7 +144,6 @@ module 	sxga(
 		
 	end
 	
-		
 // SRAM part
 	wire [15:0]	sram_d = sram_dq;
 	wire [17:0] saddr = {bitmap_y[20:12], bitmap_x[20:12]};
@@ -155,7 +161,6 @@ module 	sxga(
 		sram_ub_n <= ~b_req[1];
 	end
 	
-	
 // VGA-out part	
 	reg	[1:0] hf_delayed;
 
@@ -166,12 +171,12 @@ module 	sxga(
     end
 	
 	wire [2:0] cmask = vcnt[8:6];
-	wire cmask_en = vcnt[10:9] == 2'b01;
+	wire cmask_en = vcnt[10:9] == 2'b00;
     
 	wire en = hf_delayed[1];
 	
-	// wire [7:0] luma = hcnt[9:2] - 128;
-	wire [7:0] luma = hcnt[8:1];
+	wire [7:0] luma = hcnt[9:2] - 128;
+	// wire [7:0] luma = hcnt[7:0];
 
 	
 	always @(negedge clk)
@@ -189,7 +194,6 @@ module 	sxga(
 			b[7:3] <= en ? sram_d[4:0] : 0;
 		end
     
-	
 // Zooming and Rotating control
 	always @(posedge clk)
 	begin
@@ -221,5 +225,4 @@ module 	sxga(
 		end
 	end
 
-	
 endmodule

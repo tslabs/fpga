@@ -24,6 +24,9 @@
 # Clock constraints
 
 create_clock -name "CLK50" -period 20.000ns [get_ports {CLK50}]
+create_clock -name "clk0" -period 4.444ns [get_ports {pll:pll|c0}]
+create_clock -name "clk1" -period 8.888ns [get_ports {pll:pll|c1}]
+create_clock -name "clk2" -period 17.777ns [get_ports {pll:pll|c2}]
 
 
 # Automatically constrain PLL and other generated clocks
