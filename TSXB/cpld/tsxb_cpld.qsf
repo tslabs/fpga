@@ -1,0 +1,167 @@
+# -------------------------------------------------------------------------- #
+#
+# Copyright (C) 1991-2013 Altera Corporation
+# Your use of Altera Corporation's design tools, logic functions 
+# and other software and tools, and its AMPP partner logic 
+# functions, and any output files from any of the foregoing 
+# (including device programming or simulation files), and any 
+# associated documentation or information are expressly subject 
+# to the terms and conditions of the Altera Program License 
+# Subscription Agreement, Altera MegaCore Function License 
+# Agreement, or other applicable license agreement, including, 
+# without limitation, that your use is for the sole purpose of 
+# programming logic devices manufactured by Altera and sold by 
+# Altera or its authorized distributors.  Please refer to the 
+# applicable agreement for further details.
+#
+# -------------------------------------------------------------------------- #
+#
+# Quartus II 32-bit
+# Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
+# Date created = 23:18:08  January 20, 2014
+#
+# -------------------------------------------------------------------------- #
+#
+# Notes:
+#
+# 1) The default values for assignments are stored in the file:
+#		tsxb_cpld_assignment_defaults.qdf
+#    If this file doesn't exist, see file:
+#		assignment_defaults.qdf
+#
+# 2) Altera recommends that you do not modify this file. This
+#    file is updated automatically by the Quartus II software
+#    and any changes you make may be lost or overwritten.
+#
+# -------------------------------------------------------------------------- #
+
+
+
+# Project-Wide Assignments
+# ========================
+set_global_assignment -name ORIGINAL_QUARTUS_VERSION "11.0 SP1"
+set_global_assignment -name PROJECT_CREATION_TIME_DATE "10:44:02  MAY 22, 2013"
+set_global_assignment -name LAST_QUARTUS_VERSION "13.0 SP1"
+set_global_assignment -name VERILOG_FILE src/top.v
+set_global_assignment -name MISC_FILE "d:/svn/FPGA/TSL/TSXB/cpld/qua/tsxb_cpld.dpf"
+set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+
+# Pin & Location Assignments
+# ==========================
+set_location_assignment PIN_1 -to ZCSROM_N
+set_location_assignment PIN_6 -to ZA[11]
+set_location_assignment PIN_8 -to ZA[10]
+set_location_assignment PIN_9 -to ZA[9]
+set_location_assignment PIN_10 -to ZA[8]
+set_location_assignment PIN_12 -to ZA[4]
+set_location_assignment PIN_13 -to ZA[5]
+set_location_assignment PIN_14 -to ZA[6]
+set_location_assignment PIN_16 -to ZA[7]
+set_location_assignment PIN_17 -to ZWR_N
+set_location_assignment PIN_19 -to ZBUSRQ_N
+set_location_assignment PIN_20 -to ZRD_N
+set_location_assignment PIN_21 -to ZIORQ_N
+set_location_assignment PIN_23 -to ZMRQ_N
+set_location_assignment PIN_25 -to ZRDROM_N
+set_location_assignment PIN_29 -to ZIORGE_N
+set_location_assignment PIN_30 -to ZA[3]
+set_location_assignment PIN_31 -to ZD[4]
+set_location_assignment PIN_32 -to ZA[2]
+set_location_assignment PIN_35 -to ZD[3]
+set_location_assignment PIN_36 -to ZA[1]
+set_location_assignment PIN_37 -to ZD[5]
+set_location_assignment PIN_40 -to ZA[0]
+set_location_assignment PIN_41 -to ZD[6]
+set_location_assignment PIN_42 -to ZD[2]
+set_location_assignment PIN_44 -to ZD[1]
+set_location_assignment PIN_45 -to ZD[0]
+set_location_assignment PIN_46 -to ZD[7]
+set_location_assignment PIN_47 -to ZA[13]
+set_location_assignment PIN_48 -to ZA[12]
+set_location_assignment PIN_52 -to ZA[14]
+set_location_assignment PIN_54 -to ZA[15]
+set_location_assignment PIN_56 -to FCI[0]
+set_location_assignment PIN_57 -to FCI[1]
+set_location_assignment PIN_58 -to FCI[2]
+set_location_assignment PIN_60 -to FCI[3]
+set_location_assignment PIN_61 -to FCI[4]
+set_location_assignment PIN_63 -to FCI[5]
+set_location_assignment PIN_67 -to FCI[6]
+set_location_assignment PIN_68 -to FCI[7]
+set_location_assignment PIN_69 -to DATA0
+set_location_assignment PIN_71 -to DCLK
+set_location_assignment PIN_75 -to NCONFIG
+set_location_assignment PIN_76 -to MSEL0
+set_location_assignment PIN_79 -to DDIR
+set_location_assignment PIN_92 -to FDIR
+set_location_assignment PIN_87 -to CLK50
+set_location_assignment PIN_88 -to ZBUSAK_N
+set_location_assignment PIN_89 -to CONF_DONE
+set_location_assignment PIN_90 -to NSTATUS
+set_location_assignment PIN_80 -to FCI_S[0]
+set_location_assignment PIN_81 -to FCI_S[1]
+set_location_assignment PIN_83 -to FRD_N
+set_location_assignment PIN_84 -to FWR_N
+set_location_assignment PIN_85 -to FMRQ_N
+set_location_assignment PIN_64 -to FIORQ_N
+
+# Classic Timing Assignments
+# ==========================
+set_global_assignment -name ANALYZE_LATCHES_AS_SYNCHRONOUS_ELEMENTS OFF
+set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS OFF
+
+# Analysis & Synthesis Assignments
+# ================================
+set_global_assignment -name FAMILY MAX3000A
+set_global_assignment -name TOP_LEVEL_ENTITY tsxb_cpld
+set_global_assignment -name DEVICE_FILTER_PACKAGE "ANY QFP"
+set_global_assignment -name DEVICE_FILTER_PIN_COUNT 100
+set_global_assignment -name DEVICE_FILTER_SPEED_GRADE 10
+set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS OFF
+set_global_assignment -name MAX7000_OPTIMIZATION_TECHNIQUE SPEED
+set_global_assignment -name AUTO_LCELL_INSERTION OFF
+
+# Fitter Assignments
+# ==================
+set_global_assignment -name DEVICE "EPM3128ATC100-10"
+set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR "-1"
+set_global_assignment -name OPTIMIZE_HOLD_TIMING OFF
+set_global_assignment -name FITTER_EFFORT "STANDARD FIT"
+set_global_assignment -name MAX7000_DEVICE_IO_STANDARD "3.3-V LVTTL"
+set_global_assignment -name AUTO_TURBO_BIT ON
+set_global_assignment -name ECO_OPTIMIZE_TIMING ON
+set_global_assignment -name ECO_REGENERATE_REPORT ON
+set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING OFF
+
+# Assembler Assignments
+# =====================
+set_global_assignment -name USE_CONFIGURATION_DEVICE ON
+
+# Netlist Viewer Assignments
+# ==========================
+set_global_assignment -name RTLV_GROUP_COMB_LOGIC_IN_CLOUD_TMV OFF
+
+# start CLOCK(clk)
+# ----------------
+
+	# Classic Timing Assignments
+	# ==========================
+	set_global_assignment -name FMAX_REQUIREMENT "50 MHz" -section_id clk
+
+# end CLOCK(clk)
+# --------------
+
+# -----------------------
+# start ENTITY(tsxb_cpld)
+
+	# Classic Timing Assignments
+	# ==========================
+	set_instance_assignment -name CLOCK_SETTINGS clk -to CLK50
+
+	# Fitter Assignments
+	# ==================
+	set_instance_assignment -name GLOBAL_SIGNAL "GLOBAL CLOCK" -to CLK50
+
+# end ENTITY(tsxb_cpld)
+# ---------------------
+set_global_assignment -name SDC_FILE tsxb_cpld.sdc

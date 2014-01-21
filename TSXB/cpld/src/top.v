@@ -1,94 +1,71 @@
 module tsxb_cpld
 (
 	// clock
-	input wire clk50,			// dedicated In
+	input wire CLK50,			// dedicated In
 
 	// ZX-BUS connector
-	inout wire [15:0] za,
-	inout wire zd0, zd7,
-	input wire zd1, zd2, zd3, zd4, zd5, zd6,
-	inout wire zrd_n, zwr_n, zmrq_n, ziorq_n,
-	output wire zbusrq_n,
-	input wire zbusak_n,	// dedicated In
-	output wire ziorge_n,
-	input wire zcsrom_n,
-	output wire zrdrom_n,
+	input wire [15:0] ZA,
+	inout wire [7:0] ZD,
+	input wire ZRD_N, ZWR_N, ZMRQ_N, ZIORQ_N,
+	input wire ZBUSAK_N,	// dedicated In
+	input wire ZCSROM_N,
+	output wire ZBUSRQ_N,
+	output wire ZIORGE_N,
+	output wire ZRDROM_N,
 
-	// FPGA connector
-	inout wire [7:0] fa,
-	inout wire fa_sel,
-	inout wire frd_n, fwr_n, fmrq_n, fiorq_n,
-	input wire fbusrq_n,
-	input wire fiorge_n_forq_n,
-
-	// ~FIORGE/FORQ
-	// When host is master, FPGA asserts this signal as ~IORGE in either I/O address decoding cycle or
-	// together with host ~ZCSROM active, if FPGA wants to replace host ROM.
-	// Together with host ~RD active it drives data output from FPGA to host.
-	// When ~ZCSROM and ~IORGE both active ~RDROM is set to 1 and host ROM is blocked.
-	// When host is slave: ~FORQ means that FPGA wants to output data. Similar T80 signal may be used for this purpose.
+	// FCI connector
+	inout wire [7:0] FCI,
+	input wire [1:0] FCI_S,
+	input wire FDIR,			// 1 - from CPLD to FPGA (CPU write), default state when FPGA is being configured / 0 - from FPGA to CPLD (CPU read)
 
 	// ZX-BUS bus transmitter
-	output wire ddir,
+	output wire DDIR,
+	output wire FRD_N,
+	output wire FWR_N,
+	output wire FMRQ_N,
+	output wire FIORQ_N,
 
 	// FPGA configuration
-	output wire msel0,
-	output wire dclk,
-	output wire data0,
-	inout wire nconfig,
-	input wire nstatus,		// dedicated In
-	input wire conf_done	// dedicated In
+	output wire MSEL0,
+	output wire DCLK,
+	output wire DATA0,
+	inout wire NCONFIG,
+	input wire NSTATUS,		// dedicated In
+	input wire CONF_DONE	// dedicated In
 );
 
-	wire [7:0] zd = {zd7, zd6, zd5, zd4, zd3, zd2, zd1, zd0};
-	wire fiorge_n = fiorge_n_forq_n;	// just aliases
-	wire forq_n = fiorge_n_forq_n;      //
+	assign DDIR = 1'b0;		// legacy 16245 - to be removed
 
 // ZXBUS handling
 
-	/* ZXBUS bus */
-	assign zd0 = (zbusak_n && stat_hit) ? nstatus : 1'bZ;
-	assign zd7 = (zbusak_n && stat_hit) ? conf_done : 1'bZ;
-	assign za = zbusak_n ? 16'hZZZZ : faddr;
-	assign zrd_n = zbusak_n ? 1'bZ : frd_n;
-	assign zwr_n = zbusak_n ? 1'bZ : fwr_n;
-	assign zmrq_n = zbusak_n ? 1'bZ : fmrq_n;
-	assign ziorq_n = zbusak_n ? 1'bZ : fiorq_n;
-	assign zbusrq_n = fbusrq_n;
-	assign ziorge_n = (zbusak_n ? fiorge_n : 1'b1) && !conf_hit && !data_hit;
-	assign zrdrom_n = (!zcsrom_n && !fiorge_n && zbusak_n) ? 1'b1 : 1'bZ;
+	/* ZXBUS */
+	assign ZD = FDIR ? 8'bZZ : FCI;
+	assign ZBUSRQ_N = 1;
+	assign ZIORGE_N = 1;
+	assign ZRDROM_N = 1'bZ;
 
 	/* FPGA bus */
-	assign fa = zbusak_n ? zaddr : 8'hZZ;
-	assign fa_sel = zbusak_n ? fsel_r : 1'bZ;
-	assign frd_n = zbusak_n ? zrd_n : 1'bZ;
-	assign fwr_n = zbusak_n ? zwr_n : 1'bZ;
-	assign fmrq_n = zbusak_n ? zmrq_n : 1'bZ;
-	assign fiorq_n = zbusak_n ? ziorq_n : 1'bZ;
+	assign FRD_N = ZRD_N;
+	assign FWR_N = ZWR_N;
+	assign FMRQ_N = ZMRQ_N;
+	assign FIORQ_N = ZIORQ_N;
 
-	/* FPGA address muxing */
-	wire [7:0] zaddr = fa_sel ? za[15:8] : za[7:0];
-	wire [15:0] faddr = {fa_h, fa};
+	/* FCI bus */
+	assign FCI = FDIR ? fci_mux : 8'bZZ;
 
-	reg fsel_r;
-	always @(posedge clk50)
-		fsel_r <= ~fsel_r;
+	localparam FCI_ZAL = 2'h0;
+	localparam FCI_ZAH = 2'h1;
+	localparam FCI_ZD = 2'h2;
+	localparam FCI_ZC = 2'h3;
 
-	reg [7:0] fa_h;
-	always @(posedge clk50)
-		if (fa_sel)
-			fa_h <= fa;
-
-	/* 16245 data direction */
-	localparam FPGA_TO_ZXBUS = 1'b0;
-	localparam ZXBUS_TO_FPGA = 1'b1;
-
-	assign ddir = zbusak_n ? slave_dir : master_dir;
-		// in Slave mode FPGA outputs data only if own address decoded and read request from host received
-	wire slave_dir = (!fiorge_n && !zrd_n) ? FPGA_TO_ZXBUS : ZXBUS_TO_FPGA;
-		// in Master mode FPGA outputs data only by FORQ request
-	wire master_dir = forq_n ? ZXBUS_TO_FPGA : FPGA_TO_ZXBUS;
-
+	wire [7:0] fci_mux = fci_mx[FCI_S];
+	wire [7:0] fci_mx[0:3];
+	assign fci_mx[FCI_ZAL] = ZA[7:0];
+	assign fci_mx[FCI_ZAH] = ZA[15:8];
+	assign fci_mx[FCI_ZD ] = ZD[7:0];
+	assign fci_mx[FCI_ZC ] = ZD[7:0];
+			
+// ---------------------------------------------------------------------------------------
 // PS configuration
 
 	// Ports:
@@ -105,53 +82,53 @@ module tsxb_cpld
 	//	bit7: CONF_DONE
 
 	/* top-level assignments */
-	assign nconfig = config_int ? 1'b0 : 1'bZ;
-	assign msel0 = msel0_int;
-	assign dclk = conf_done ? 1'b0 : (ps_mode ? dclk_int : 1'bZ);
-	assign data0 = conf_done ? 1'b0 : (ps_mode ? bs_shift[0] : 1'bZ);
+	assign NCONFIG = config_int ? 1'b0 : 1'bZ;
+	assign MSEL0 = msel0_int;
+	assign DCLK = CONF_DONE ? 1'b0 : (ps_mode ? dclk_int : 1'bZ);
+	assign DATA0 = CONF_DONE ? 1'b0 : (ps_mode ? bs_shift[0] : 1'bZ);
 
 	/* ports decoding */
-	wire ports_hit = !ziorq_n && (za[7:0] == 8'hAF);
-	wire conf_hit = ports_hit && (za[15:8] == 8'hE0);
-	wire data_hit = ports_hit && !za[15] && !zwr_n && !conf_done && ps_mode;
-	wire ctrl_hit = conf_hit && !zwr_n;
-	wire stat_hit = conf_hit && !zrd_n;
+	wire ports_hit = !ZIORQ_N && (ZA[7:0] == 8'hAF);
+	wire conf_hit = ports_hit && (ZA[15:8] == 8'hE0);
+	wire data_hit = ports_hit && !ZA[15] && !ZWR_N && !CONF_DONE && ps_mode;
+	wire ctrl_hit = conf_hit && !ZWR_N;
+	wire stat_hit = conf_hit && !ZRD_N;
 
 	/* control signals re-sync */
 	reg data_hit_r;
 	reg ctrl_hit_r;
 	reg nconfig_r;
-	always @(posedge clk50)
+	always @(posedge CLK50)
 	begin
 		data_hit_r <= data_hit;
 		ctrl_hit_r <= ctrl_hit;
-		nconfig_r <= nconfig;
+		nconfig_r <= NCONFIG;
 	end
 
 	/* PS mode latch */
 	reg ps_mode = 0;
-	always @(posedge clk50)
+	always @(posedge CLK50)
 		if (!nconfig_r)
-			ps_mode <= msel0;
+			ps_mode <= MSEL0;
 
 	/* configuration control register */
 	reg config_int = 0;
 	reg msel0_int = 0;
-	always @(posedge clk50)
+	always @(posedge CLK50)
 		if (ctrl_hit_r)
 		begin
-			config_int <= zd0;
-			msel0_int <= zd1;
+			config_int <= ZD[0];
+			msel0_int <= ZD[1];
 		end
 
 	/* bitstream data processing */
 	reg [7:0] bs_shift;
 	reg [3:0] bit_cnt = 4'b1000;
 	reg dclk_int = 0;
-	always @(posedge clk50)
+	always @(posedge CLK50)
 		if (data_hit_r)
 		begin
-			bs_shift <= zd;
+			bs_shift <= ZD;
 			bit_cnt <= 4'b0;
 		end
 
