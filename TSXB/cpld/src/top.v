@@ -71,9 +71,9 @@ module tsxb_cpld
 // PS configuration
 
 	// Ports:
+	// Control / Status - #F8AF
 	//
-	// Control / Status - #F0AF
-	// Bit stream data - #80AF..FFAF
+	// Bit stream data is written to memory into selected 16kB window
 	//
 	// Control (write):
 	//	bit0: 1 - nCONFIG
@@ -82,6 +82,11 @@ module tsxb_cpld
 	//	bit1: MSEL0:
 	//		0 - AS mode from EPCS4
 	//		1 - PS mode from host
+	//	bit6,7: window address:
+	//		00 - 0000..3FFF
+	//		01 - 4000..7FFF
+	//		10 - 8000..BFFF
+	//		11 - C000..FFFF
 	//
 	// Status (read):
 	//	bit0: nSTATUS
@@ -90,19 +95,19 @@ module tsxb_cpld
 	/* top-level assignments */
 	assign NCONFIG = config_int ? 1'b0 : 1'bZ;
 	assign MSEL0 = msel0_int ? 1'b1 : 1'bZ;			// mysterios issue: if MSEL0 is set to logic 0 FPGA won't configure in AS mode
-	assign DCLK = CONF_DONE ? 1'bZ : (msel0_r ? dclk_int : 1'bZ);
-	assign DATA0 = CONF_DONE ? 1'bZ : (msel0_r ? bs_shift[0] : 1'bZ);
+	assign DCLK = CONF_DONE ? 1'bZ : (ps_mode ? dclk_int : 1'bZ);
+	assign DATA0 = CONF_DONE ? 1'bZ : (ps_mode ? bs_shift[0] : 1'bZ);
 
 	/* ports decoding */
-	wire ports_hit = !ZIORQ_N && (ZA[7:0] == 8'hAF);
-	wire conf_hit = ports_hit && (ZA[15:8] == 8'hF0);
+	wire conf_hit = (ZA[15:0] == 16'hF8AF) && !ZIORQ_N;
 	wire ctrl_hit = conf_hit && !ZWR_N;
 	wire stat_hit = conf_hit && !ZRD_N;
-	wire data_hit = ports_hit && !ZWR_N && ZA[15] && ps_mode;
+	wire data_hit = (ZA[15:14] == conf_addr) && !ZMRQ_N && !ZWR_N && ps_mode;
 
 	/* configuration control register */
 	reg config_int = 0;
 	reg msel0_int = 0;
+	reg [1:0] conf_addr;
 	reg ctrl_hit_r;
 
 	always @(posedge CLK50)
@@ -113,15 +118,17 @@ module tsxb_cpld
 		begin
 			config_int <= ZD[0];
 			msel0_int <= ZD[1];
+			conf_addr <= ZD[7:6];
 		end
 	end
 
 	/* PS mode latch */
-	wire ps_mode = !CONF_DONE && msel0_r;
-
-	reg msel0_r = 0;
-	always @(posedge NCONFIG)
-		msel0_r <= msel0_int;
+	reg ps_mode = 0;
+	always @(posedge NCONFIG, posedge CONF_DONE)
+		if (CONF_DONE)
+			ps_mode <= 1'b0;
+		else
+			ps_mode <= msel0_int;
 
 	/* bitstream data processing */
 	reg [7:0] bs_shift;
@@ -147,6 +154,7 @@ module tsxb_cpld
 			
 			if (dclk_int)
 			begin
+				dclk_int <= 1'b0;
 				bs_shift[7:0] <= {1'b0, bs_shift[7:1]};
 				bit_cnt <= bit_cnt + 4'd1;
 			end
