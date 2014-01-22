@@ -39,7 +39,9 @@ module tsxb_cpld
 // ZXBUS handling
 
 	/* ZXBUS */
-	assign ZD = FDIR ? 8'bZZ : FCI;
+	assign ZD = stat_hit ? conf_status : (FDIR ? 1'bZ : FCI);
+	wire [7:0] conf_status = {CONF_DONE, 6'b0, NSTATUS};
+
 	assign ZBUSRQ_N = 1;
 	assign ZIORGE_N = 1;
 	assign ZRDROM_N = 1'bZ;
@@ -64,89 +66,91 @@ module tsxb_cpld
 	assign fci_mx[FCI_ZAH] = ZA[15:8];
 	assign fci_mx[FCI_ZD ] = ZD[7:0];
 	assign fci_mx[FCI_ZC ] = ZD[7:0];
-			
+
 // ---------------------------------------------------------------------------------------
 // PS configuration
 
 	// Ports:
 	//
-	// Control / Status - #E0AF
-	// Bit stream data - #00AF..7FAF
+	// Control / Status - #F0AF
+	// Bit stream data - #80AF..FFAF
 	//
-	// Control:
-	//	bit0: 1 - nCONFIG (1 - nCONFIG = 0 / 0 - nCONFIG = Z)
-	//	bit1: MSEL0: 0 - AS mode from EPCS4 / 1 - PS mode from host
+	// Control (write):
+	//	bit0: 1 - nCONFIG
+	//		0 - nCONFIG = Z
+	//		1 - nCONFIG = 0
+	//	bit1: MSEL0:
+	//		0 - AS mode from EPCS4
+	//		1 - PS mode from host
 	//
-	// Status:
+	// Status (read):
 	//	bit0: nSTATUS
 	//	bit7: CONF_DONE
 
 	/* top-level assignments */
 	assign NCONFIG = config_int ? 1'b0 : 1'bZ;
-	assign MSEL0 = msel0_int;
-	assign DCLK = CONF_DONE ? 1'b0 : (ps_mode ? dclk_int : 1'bZ);
-	assign DATA0 = CONF_DONE ? 1'b0 : (ps_mode ? bs_shift[0] : 1'bZ);
+	assign MSEL0 = msel0_int ? 1'b1 : 1'bZ;			// mysterios issue: if MSEL0 is set to logic 0 FPGA won't configure in AS mode
+	assign DCLK = CONF_DONE ? 1'bZ : (msel0_r ? dclk_int : 1'bZ);
+	assign DATA0 = CONF_DONE ? 1'bZ : (msel0_r ? bs_shift[0] : 1'bZ);
 
 	/* ports decoding */
 	wire ports_hit = !ZIORQ_N && (ZA[7:0] == 8'hAF);
-	wire conf_hit = ports_hit && (ZA[15:8] == 8'hE0);
-	wire data_hit = ports_hit && !ZA[15] && !ZWR_N && !CONF_DONE && ps_mode;
+	wire conf_hit = ports_hit && (ZA[15:8] == 8'hF0);
 	wire ctrl_hit = conf_hit && !ZWR_N;
 	wire stat_hit = conf_hit && !ZRD_N;
-
-	/* control signals re-sync */
-	reg data_hit_r;
-	reg ctrl_hit_r;
-	reg nconfig_r;
-	always @(posedge CLK50)
-	begin
-		data_hit_r <= data_hit;
-		ctrl_hit_r <= ctrl_hit;
-		nconfig_r <= NCONFIG;
-	end
-
-	/* PS mode latch */
-	reg ps_mode = 0;
-	always @(posedge CLK50)
-		if (!nconfig_r)
-			ps_mode <= MSEL0;
+	wire data_hit = ports_hit && !ZWR_N && ZA[15] && ps_mode;
 
 	/* configuration control register */
 	reg config_int = 0;
 	reg msel0_int = 0;
+	reg ctrl_hit_r;
+
 	always @(posedge CLK50)
+	begin
+		ctrl_hit_r <= ctrl_hit;		// re-sync
+
 		if (ctrl_hit_r)
 		begin
 			config_int <= ZD[0];
 			msel0_int <= ZD[1];
 		end
+	end
+
+	/* PS mode latch */
+	wire ps_mode = !CONF_DONE && msel0_r;
+
+	reg msel0_r = 0;
+	always @(posedge NCONFIG)
+		msel0_r <= msel0_int;
 
 	/* bitstream data processing */
 	reg [7:0] bs_shift;
 	reg [3:0] bit_cnt = 4'b1000;
 	reg dclk_int = 0;
+	reg [1:0] data_hit_r;
+	wire data_hit_s = data_hit_r[0] && !data_hit_r[1];
+
 	always @(posedge CLK50)
-		if (data_hit_r)
+	begin
+		data_hit_r <= {data_hit_r[0], data_hit};		// re-sync
+
+		if (data_hit_s)
 		begin
 			bs_shift <= ZD;
 			bit_cnt <= 4'b0;
+			dclk_int <= 1'b0;
 		end
 
-		// !data_hit_r
-		else if (!dclk_int)
+		else if (!bit_cnt[3])
 		begin
-			if (!bit_cnt[3])
+			dclk_int <= ~dclk_int;
+			
+			if (dclk_int)
 			begin
-				dclk_int <= 1'b1;
+				bs_shift[7:0] <= {1'b0, bs_shift[7:1]};
 				bit_cnt <= bit_cnt + 4'd1;
 			end
 		end
-
-		// dclk_int
-		else
-		begin
-			bs_shift[7:0] <= {1'b0, bs_shift[7:1]};
-			dclk_int <= 1'b0;
-		end
+	end
 
 endmodule
