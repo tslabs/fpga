@@ -1,7 +1,7 @@
 module fpga_kick
 (
 	// clock
-	input wire CLK50,
+	input wire CLK_IN,		// 50MHz
 
 	// ZX-BUS
 	input wire FRD_N,
@@ -66,11 +66,13 @@ module fpga_kick
 	assign DAC_LRCK = soundbit_l;
 	assign DAC_MCLK = soundbit_r;
 
+	assign SR_D = SR_WE_N ? 16'hZZZZ : {zxbdata_in, zxbdata_in};
+	
 	wire zxb_en = zxb_mni ? mem_en : port_en;
 
 	wire mem_en  = zxb_rnw ? mrd_en : mwr_en;
 	wire mrd_en = 1'b0;
-	wire mwr_en = 1'b0;
+	wire mwr_en = (zxbaddr[15:14] == srpage[7:6]) && srpage[5];
 
 	wire clk0;
 	wire clk1;
@@ -96,6 +98,10 @@ module fpga_kick
 	wire soundbit_l;
 	wire soundbit_r;
 
+	wire [7:0] srpage;
+	
+	wire [7:0] test;
+	
 	zxbus zxbus
 	(
 		.clk		(clk1),
@@ -129,7 +135,9 @@ module fpga_kick
 		.port_req	(zxbport_req),
 		.port_stb	(port_stb),
 		.covox_stb	(covox_stb),
-		.sdrv_stb	(sdrv_stb)
+		.sdrv_stb	(sdrv_stb),
+		.srpage		(srpage),
+		.test		(test)
 	);
 
 	sound sound
@@ -146,7 +154,7 @@ module fpga_kick
 
 	pll	pll
 	(
-		.inclk0 (CLK50),	// 50 MHz
+		.inclk0 (CLK_IN),	// 50 MHz
 		.c0     (clk0),		// 225 MHz
 		.c1     (clk1),		// 112.5 MHz
 		.c2     (clk2)		// 56.25 MHz
@@ -160,13 +168,16 @@ module fpga_kick
 		.b   		(V_B),
 		.hs  		(V_HS),
 		.vs  		(V_VS),
+		.waddr		(zxbaddr),
+		.srpage		(srpage),
+        .wstb       (zxbmem_req && !zxb_rnw),
 		.sram_dq    (SR_D),
 		.sram_addr  (SR_A),
 		.sram_oe_n  (SR_OE_N),
 		.sram_we_n  (SR_WE_N),
 		.sram_ub_n  (SR_BHE_N),
 		.sram_lb_n  (SR_BLE_N),
-		.key		(4'b1111)
+		.key		(~test[3:0])
 	);
 
 endmodule

@@ -8,6 +8,10 @@ module 	sxga
 	output reg			hs,
 	output reg			vs,
 	
+	input wire  [18:0]	waddr,
+	input wire  [7:0]	srpage,
+	input wire			wstb,
+	
 	input  wire [15:0]	sram_dq,	
 	output reg  [17:0]	sram_addr,
     output reg  		sram_oe_n,
@@ -149,14 +153,23 @@ module 	sxga
 	wire [17:0] saddr = {bitmap_y[20:12], bitmap_x[20:12]};
 	wire 		v_req = hfetch;
 	wire		r_req = v_req;
-	wire		w_req = 0;
 	wire [ 1:0] b_req = 2'b11;
 
   	always @(posedge clk)
+	if (wstb)
+	begin
+		sram_addr <= {srpage[4:0], waddr[13:1]};
+		sram_oe_n <= 1'b1;
+		sram_we_n <= 1'b0;
+		sram_lb_n <= waddr[0];
+		sram_ub_n <= ~waddr[0];
+	end
+	
+	else
 	begin
 		sram_addr <= saddr;
 		sram_oe_n <= ~r_req;
-		sram_we_n <= ~w_req;
+		sram_we_n <= 1'b1;
 		sram_lb_n <= ~b_req[0];
 		sram_ub_n <= ~b_req[1];
 	end

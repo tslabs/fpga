@@ -10,7 +10,7 @@ module 	zxbus
 	
 	input wire [7:0] fci_in,
 	output reg [1:0] fci_sel,
-	output reg fci_dir,
+	output wire fci_dir,
 	
 	output reg [15:0] zaddr,		// addr from CPU
 	output reg [7:0] zdata_in,		// data from CPU
@@ -24,9 +24,10 @@ module 	zxbus
 	input wire port_stb
 );
 	
+	assign fci_dir = fci_dir_int;
+	
 	reg [7:0] memdata_out;
 	reg [7:0] portdata_out;
-	
 
 	reg zmrd, zmwr, ziord, ziowr;
 
@@ -46,11 +47,13 @@ module 	zxbus
 	localparam FCI_ZAH = 2'h1;
 	localparam FCI_ZD  = 2'h2;
 
+	reg fci_dir_int = 1'b1;
+	
 	always @(posedge clk)
 	begin
 		if (reset)
 		begin
-			fci_dir <= 1'b1;
+			fci_dir_int <= 1'b1;
 			mem_req <= 1'b0;
 			port_req <= 1'b0;
 			zxb_state <= 4'h0;
@@ -102,7 +105,7 @@ module 	zxbus
 					if (zxb_rnw)
 					// read event
 					begin
-						fci_dir <= 1'b0;	// route internal data selector to Z80 databus
+						fci_dir_int <= 1'b0;	// route internal data selector to Z80 databus
 
 						if (zxb_mni)
 						// memory read
@@ -174,7 +177,7 @@ module 	zxbus
 			begin
 				if (!(zmrd || zmwr || ziord || ziowr))		// wait for the end of bus activity
 				begin
-					fci_dir <= 1'b1;		// release data bus
+					fci_dir_int <= 1'b1;		// release data bus
 					zxb_state <= 4'h0;		// return to Idle state
 				end
 			end

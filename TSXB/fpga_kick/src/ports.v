@@ -12,6 +12,8 @@ module 	ports
 	output wire covox_stb,
 	output wire sdrv_stb,
 	
+	output reg [7:0] srpage,
+	
 	output reg [7:0] test
 );
 	
@@ -61,6 +63,8 @@ module 	ports
 		begin
 			if (hia == TESTW)
 				test <= data_in;
+			if (hia == TESTW2)
+				srpage <= data_in;
 		end
 	
 endmodule
