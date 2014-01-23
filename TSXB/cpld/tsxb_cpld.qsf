@@ -92,9 +92,7 @@ set_location_assignment PIN_69 -to DATA0
 set_location_assignment PIN_71 -to DCLK
 set_location_assignment PIN_75 -to NCONFIG
 set_location_assignment PIN_76 -to MSEL0
-set_location_assignment PIN_79 -to DDIR
 set_location_assignment PIN_92 -to FDIR
-set_location_assignment PIN_87 -to CLK50
 set_location_assignment PIN_88 -to ZBUSAK_N
 set_location_assignment PIN_89 -to CONF_DONE
 set_location_assignment PIN_90 -to NSTATUS
@@ -160,8 +158,10 @@ set_global_assignment -name RTLV_GROUP_COMB_LOGIC_IN_CLOUD_TMV OFF
 
 	# Fitter Assignments
 	# ==================
-	set_instance_assignment -name GLOBAL_SIGNAL "GLOBAL CLOCK" -to CLK50
 
 # end ENTITY(tsxb_cpld)
 # ---------------------
 set_global_assignment -name SDC_FILE tsxb_cpld.sdc
+set_location_assignment PIN_87 -to CLK_IN
+set_instance_assignment -name GLOBAL_SIGNAL "GLOBAL CLOCK" -to CLK_IN
+set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS OUTPUT DRIVING AN UNSPECIFIED SIGNAL"
