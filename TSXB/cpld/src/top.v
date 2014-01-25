@@ -19,10 +19,10 @@ module tsxb_cpld
 	input wire FDIR,			// 1 - from CPLD to FPGA (CPU write), default state when FPGA is being configured / 0 - from FPGA to CPLD (CPU read)
 
 	// ZX-BUS bus transmitter to FPGA
-	output wire FRD_N,
-	output wire FWR_N,
-	output wire FMRQ_N,
-	output wire FIORQ_N,
+	output wire FRD,
+	output wire FWR,
+	output wire FMRQ,
+	output wire FIORQ,
 
 	// FPGA configuration
 	output wire MSEL0,
@@ -47,10 +47,10 @@ module tsxb_cpld
 
 	// FPGA bus
 	assign FCI     = CONF_DONE ? (FDIR ? fci_mux : 8'bZZ) : 8'bZZ;
-	assign FRD_N   = CONF_DONE ? ZRD_N   : 1'bZ;
-	assign FWR_N   = CONF_DONE ? ZWR_N   : 1'bZ;
-	assign FMRQ_N  = CONF_DONE ? ZMRQ_N  : 1'bZ;
-	assign FIORQ_N = CONF_DONE ? ZIORQ_N : 1'bZ;
+	assign FRD   = CONF_DONE ? !ZRD_N   : 1'bZ;
+	assign FWR   = CONF_DONE ? !ZWR_N   : 1'bZ;
+	assign FMRQ  = CONF_DONE ? !ZMRQ_N  : 1'bZ;
+	assign FIORQ = CONF_DONE ? !ZIORQ_N : 1'bZ;
 
 	wire [7:0] conf_status = {CONF_DONE, 6'b0, NSTATUS};
 
@@ -148,9 +148,9 @@ module tsxb_cpld
 		begin
 			dclk_int <= ~dclk_int;
 
+			// falling edge of DCLK
 			if (dclk_int)
 			begin
-				dclk_int <= 1'b0;
 				bs_shift[7:0] <= {1'b0, bs_shift[7:1]};
 				bit_cnt <= bit_cnt + 4'd1;
 			end

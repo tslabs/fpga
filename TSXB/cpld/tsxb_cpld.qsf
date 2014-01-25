@@ -18,7 +18,7 @@
 #
 # Quartus II 32-bit
 # Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
-# Date created = 23:18:08  January 20, 2014
+# Date created = 03:00:14  January 25, 2014
 #
 # -------------------------------------------------------------------------- #
 #
@@ -45,6 +45,7 @@ set_global_assignment -name LAST_QUARTUS_VERSION "13.0 SP1"
 set_global_assignment -name VERILOG_FILE src/top.v
 set_global_assignment -name MISC_FILE "d:/svn/FPGA/TSL/TSXB/cpld/qua/tsxb_cpld.dpf"
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+set_global_assignment -name SDC_FILE tsxb_cpld.sdc
 
 # Pin & Location Assignments
 # ==========================
@@ -86,8 +87,8 @@ set_location_assignment PIN_58 -to FCI[2]
 set_location_assignment PIN_60 -to FCI[3]
 set_location_assignment PIN_61 -to FCI[4]
 set_location_assignment PIN_63 -to FCI[5]
-set_location_assignment PIN_67 -to FCI[6]
-set_location_assignment PIN_68 -to FCI[7]
+set_location_assignment PIN_64 -to FCI[6]
+set_location_assignment PIN_67 -to FCI[7]
 set_location_assignment PIN_69 -to DATA0
 set_location_assignment PIN_71 -to DCLK
 set_location_assignment PIN_75 -to NCONFIG
@@ -98,10 +99,11 @@ set_location_assignment PIN_89 -to CONF_DONE
 set_location_assignment PIN_90 -to NSTATUS
 set_location_assignment PIN_80 -to FCI_S[0]
 set_location_assignment PIN_81 -to FCI_S[1]
-set_location_assignment PIN_83 -to FRD_N
-set_location_assignment PIN_84 -to FWR_N
-set_location_assignment PIN_85 -to FMRQ_N
-set_location_assignment PIN_64 -to FIORQ_N
+set_location_assignment PIN_87 -to CLK_IN
+set_location_assignment PIN_68 -to FIORQ
+set_location_assignment PIN_83 -to FRD
+set_location_assignment PIN_84 -to FWR
+set_location_assignment PIN_85 -to FMRQ
 
 # Classic Timing Assignments
 # ==========================
@@ -134,6 +136,7 @@ set_global_assignment -name OPTIMIZE_MULTI_CORNER_TIMING OFF
 # Assembler Assignments
 # =====================
 set_global_assignment -name USE_CONFIGURATION_DEVICE ON
+set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS OUTPUT DRIVING AN UNSPECIFIED SIGNAL"
 
 # Netlist Viewer Assignments
 # ==========================
@@ -158,10 +161,7 @@ set_global_assignment -name RTLV_GROUP_COMB_LOGIC_IN_CLOUD_TMV OFF
 
 	# Fitter Assignments
 	# ==================
+	set_instance_assignment -name GLOBAL_SIGNAL "GLOBAL CLOCK" -to CLK_IN
 
 # end ENTITY(tsxb_cpld)
 # ---------------------
-set_global_assignment -name SDC_FILE tsxb_cpld.sdc
-set_location_assignment PIN_87 -to CLK_IN
-set_instance_assignment -name GLOBAL_SIGNAL "GLOBAL CLOCK" -to CLK_IN
-set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS OUTPUT DRIVING AN UNSPECIFIED SIGNAL"
