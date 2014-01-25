@@ -18,7 +18,7 @@
 #
 # Quartus II 32-bit
 # Version 13.0.1 Build 232 06/12/2013 Service Pack 1 SJ Web Edition
-# Date created = 19:30:16  January 23, 2014
+# Date created = 02:59:40  January 25, 2014
 #
 # -------------------------------------------------------------------------- #
 #
@@ -45,6 +45,7 @@ set_global_assignment -name LAST_QUARTUS_VERSION "13.0 SP1"
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 set_global_assignment -name SMART_RECOMPILE ON
 set_global_assignment -name FLOW_ENABLE_RTL_VIEWER OFF
+set_global_assignment -name VERILOG_FILE src/epcs.v
 set_global_assignment -name VERILOG_FILE src/sound.v
 set_global_assignment -name VERILOG_FILE src/ports.v
 set_global_assignment -name VERILOG_FILE src/zxbus.v
@@ -54,6 +55,7 @@ set_global_assignment -name VERILOG_FILE src/top.v
 set_global_assignment -name SIGNALTAP_FILE zxbus.stp
 set_global_assignment -name SDC_FILE fpga_kick.sdc
 set_global_assignment -name CDF_FILE fpga_kick.cdf
+set_global_assignment -name SLD_FILE "d:/VCS/Hg/FPGA/TSXB/fpga_kick/zxbus_auto_stripped.stp"
 
 # Pin & Location Assignments
 # ==========================
@@ -162,8 +164,8 @@ set_location_assignment PIN_11 -to FCI[2]
 set_location_assignment PIN_12 -to FCI[3]
 set_location_assignment PIN_13 -to FCI[4]
 set_location_assignment PIN_14 -to FCI[5]
-set_location_assignment PIN_30 -to FCI[6]
-set_location_assignment PIN_31 -to FCI[7]
+set_location_assignment PIN_15 -to FCI[6]
+set_location_assignment PIN_30 -to FCI[7]
 set_location_assignment PIN_56 -to FDIR
 set_location_assignment PIN_76 -to SD_RAS_N
 set_location_assignment PIN_77 -to SD_CAS_N
@@ -174,10 +176,6 @@ set_location_assignment PIN_200 -to SR_WE_N
 set_location_assignment PIN_173 -to SR_BLE_N
 set_location_assignment PIN_44 -to FCI_S[0]
 set_location_assignment PIN_45 -to FCI_S[1]
-set_location_assignment PIN_46 -to FRD_N
-set_location_assignment PIN_47 -to FWR_N
-set_location_assignment PIN_48 -to FMRQ_N
-set_location_assignment PIN_15 -to FIORQ_N
 set_location_assignment PIN_24 -to FCSROM_N
 set_location_assignment PIN_27 -to FM1_N
 set_location_assignment PIN_129 -to FRES_N
@@ -185,12 +183,19 @@ set_location_assignment PIN_130 -to FWAIT_N
 set_location_assignment PIN_131 -to FINT_N
 set_location_assignment PIN_132 -to FBUSAK_N
 set_location_assignment PIN_23 -to CLK_IN
+set_location_assignment PIN_1 -to ASDO
+set_location_assignment PIN_2 -to NCSO
+set_location_assignment PIN_33 -to DCLK
+set_location_assignment PIN_34 -to DATA0
+set_location_assignment PIN_46 -to FRD
+set_location_assignment PIN_47 -to FWR
+set_location_assignment PIN_48 -to FMRQ
+set_location_assignment PIN_31 -to FIORQ
 
 # Classic Timing Assignments
 # ==========================
 set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
 set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
-set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS ON
 
 # Analysis & Synthesis Assignments
 # ================================
@@ -211,12 +216,13 @@ set_global_assignment -name RESERVE_ALL_UNUSED_PINS "AS OUTPUT DRIVING AN UNSPEC
 set_global_assignment -name CYCLONEII_RESERVE_NCEO_AFTER_CONFIGURATION "USE AS REGULAR IO"
 set_global_assignment -name RESERVE_ASDO_AFTER_CONFIGURATION "USE AS REGULAR IO"
 set_global_assignment -name ENABLE_INIT_DONE_OUTPUT OFF
+set_global_assignment -name CYCLONEII_CONFIGURATION_SCHEME "PASSIVE SERIAL"
 
 # Assembler Assignments
 # =====================
-set_global_assignment -name USE_CONFIGURATION_DEVICE ON
-set_global_assignment -name STRATIX_CONFIGURATION_DEVICE EPCS4
-set_global_assignment -name GENERATE_TTF_FILE ON
+set_global_assignment -name USE_CONFIGURATION_DEVICE OFF
+set_global_assignment -name STRATIX_CONFIGURATION_DEVICE AUTO
+set_global_assignment -name GENERATE_TTF_FILE OFF
 set_global_assignment -name GENERATE_RBF_FILE ON
 
 # SignalTap II Assignments
@@ -229,6 +235,15 @@ set_global_assignment -name USE_SIGNALTAP_FILE zxbus.stp
 set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 
+# start AUTO_INSERT_SLD_NODE_ENTITY(auto_signaltap_0)
+# ---------------------------------------------------
+
+	# SignalTap II Assignments
+	# ========================
+
+# end AUTO_INSERT_SLD_NODE_ENTITY(auto_signaltap_0)
+# -------------------------------------------------
+
 # -----------------------
 # start ENTITY(fpga_kick)
 
@@ -239,6 +254,17 @@ set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 	set_instance_assignment -name GLOBAL_SIGNAL "GLOBAL CLOCK" -to c2
 	set_instance_assignment -name GLOBAL_SIGNAL "GLOBAL CLOCK" -to CLK_IN
 
+	# start LOGICLOCK_REGION(Root Region)
+	# -----------------------------------
+
+		# LogicLock Region Assignments
+		# ============================
+		set_global_assignment -name LL_ROOT_REGION ON -section_id "Root Region"
+		set_global_assignment -name LL_MEMBER_STATE LOCKED -section_id "Root Region"
+
+	# end LOGICLOCK_REGION(Root Region)
+	# ---------------------------------
+
 	# start DESIGN_PARTITION(Top)
 	# ---------------------------
 
@@ -247,10 +273,10 @@ set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 		set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 		set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 		set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
-		set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
 
 	# end DESIGN_PARTITION(Top)
 	# -------------------------
 
 # end ENTITY(fpga_kick)
 # ---------------------
+set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

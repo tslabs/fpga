@@ -8,9 +8,11 @@ module 	sxga
 	output reg			hs,
 	output reg			vs,
 	
-	input wire  [18:0]	waddr,
-	input wire  [7:0]	srpage,
+	input wire  [15:0]	zxbaddr,
+	input wire  [7:0]	data_in,
 	input wire			wstb,
+	input wire  		srpage_stb,
+	output wire  		sxgamem_en,
 	
 	input  wire [15:0]	sram_dq,	
 	output reg  [17:0]	sram_addr,
@@ -21,6 +23,8 @@ module 	sxga
 	
 	input  wire	[3:0]	key
 );
+
+	assign sxgamem_en = (zxbaddr[15:14] == srpage[7:6]) && srpage[5];
 
 //	|...front...|...sync...|...back...|...visible...|
 //	|....48.....|...112....|...248....|....1280.....|	hor
@@ -158,11 +162,11 @@ module 	sxga
   	always @(posedge clk)
 	if (wstb)
 	begin
-		sram_addr <= {srpage[4:0], waddr[13:1]};
+		sram_addr <= {srpage[4:0], zxbaddr[13:1]};
 		sram_oe_n <= 1'b1;
 		sram_we_n <= 1'b0;
-		sram_lb_n <= waddr[0];
-		sram_ub_n <= ~waddr[0];
+		sram_lb_n <= zxbaddr[0];
+		sram_ub_n <= ~zxbaddr[0];
 	end
 	
 	else
@@ -237,5 +241,12 @@ module 	sxga
 			
 		end
 	end
+
+// Ports
+	reg [7:0] srpage;
+	
+	always @(posedge clk)
+	if (srpage_stb)
+		srpage <= data_in;
 
 endmodule

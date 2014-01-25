@@ -29,17 +29,22 @@ module 	zxbus
 	reg [7:0] memdata_out;
 	reg [7:0] portdata_out;
 
-	reg zmrd, zmwr, ziord, ziowr;
-
 	// re-strobe Z80 bus signals
+	reg rd_r, wr_r, mrq_r, iorq_r;
+	
 	always @(posedge clk)
 	begin
-		zmrd  <= mrq  && rd;
-		zmwr  <= mrq  && wr;
-		ziord <= iorq && rd;
-		ziowr <= iorq && wr;
+		  rd_r <=   rd;
+		  wr_r <=   wr;
+		 mrq_r <=  mrq;
+		iorq_r <= iorq;
 	end
 
+	wire zmrd  =  mrq_r && rd_r;
+	wire zmwr  =  mrq_r && wr_r;
+	wire ziord = iorq_r && rd_r;
+	wire ziowr = iorq_r && wr_r;
+	
 	// ZXBUS FSM
 	reg [3:0] zxb_state;
 	

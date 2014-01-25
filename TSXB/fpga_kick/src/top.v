@@ -4,10 +4,10 @@ module fpga_kick
 	input wire CLK_IN,		// 50MHz
 
 	// ZX-BUS
-	input wire FRD_N,
-	input wire FWR_N,
-	input wire FMRQ_N,
-	input wire FIORQ_N,
+	input wire FRD,
+	input wire FWR,
+	input wire FMRQ,
+	input wire FIORQ,
 	input wire FCSROM_N,
 	input wire FM1_N,
 	input wire FZF,
@@ -51,28 +51,35 @@ module fpga_kick
 	// audio DAC
 	output wire DAC_LRCK,
 	output wire DAC_MCLK,
-	output wire DAC_SDATA
+	output wire DAC_SDATA,
 
 	// conf device
-	// input wire ASDO,
-	// input wire NCSO
+	inout wire NCSO,
+	inout wire ASDO,
+	output wire DCLK,
+	input wire DATA0
 );
-
+	
+	// assign NCSO  = 1'b0;
+	// assign ASDO  = 1'b0;
+	
 	assign V_CLK = clk1;
 
 	assign FCI = FDIR ? 8'hZZ : (zxb_mni ? memdata_out : portdata_out);
-	assign FDIR = fci_dir || FRD_N;		// to release CPU data bus as soon as it de-asserts !RD signal
+	assign FDIR = fci_dir || !FRD;		// to release CPU data bus as soon as it de-asserts !RD signal
 
 	assign DAC_LRCK = soundbit_l;
 	assign DAC_MCLK = soundbit_r;
 
 	assign SR_D = SR_WE_N ? 16'hZZZZ : {zxbdata_in, zxbdata_in};
-	
+
 	wire zxb_en = zxb_mni ? mem_en : port_en;
 
 	wire mem_en  = zxb_rnw ? mrd_en : mwr_en;
 	wire mrd_en = 1'b0;
-	wire mwr_en = (zxbaddr[15:14] == srpage[7:6]) && srpage[5];
+	wire mwr_en = sxgamem_en;
+	
+	wire sxgamem_en;
 
 	wire clk0;
 	wire clk1;
@@ -80,6 +87,7 @@ module fpga_kick
 
 	wire [7:0] memdata_out;
 	wire [7:0] portdata_out;
+	wire [7:0] epcs_data_out;
 
 	wire [15:0] zxbaddr;
 	wire [7:0] zxbdata_in;
@@ -95,20 +103,22 @@ module fpga_kick
 	wire port_en;
 	wire covox_stb;
 	wire sdrv_stb;
+	wire ectrl_stb;
+	wire edata_stb;
+	wire srpage_stb;
+	
 	wire soundbit_l;
 	wire soundbit_r;
 
-	wire [7:0] srpage;
-	
 	wire [7:0] test;
-	
+
 	zxbus zxbus
 	(
 		.clk		(clk1),
-		.rd			(!FRD_N),
-		.wr			(!FWR_N),
-		.mrq		(!FMRQ_N),
-		.iorq		(!FIORQ_N),
+		.rd			(FRD),
+		.wr			(FWR),
+		.mrq		(FMRQ),
+		.iorq		(FIORQ),
 		.reset		(!FRES_N),
 		.fci_in		(FCI),
 		.fci_sel	(FCI_S),
@@ -126,18 +136,31 @@ module fpga_kick
 
 	ports ports
 	(
-		.clk		(clk1),
 		.addr		(zxbaddr),
-		.data_in	(zxbdata_in),
 		.data_out	(portdata_out),
 		.rnw		(zxb_rnw),
 		.port_en	(port_en),
 		.port_req	(zxbport_req),
 		.port_stb	(port_stb),
+		.epcs_data  (epcs_data_out),
 		.covox_stb	(covox_stb),
 		.sdrv_stb	(sdrv_stb),
-		.srpage		(srpage),
-		.test		(test)
+		.ectrl_stb	(ectrl_stb),
+		.edata_stb	(edata_stb),
+		.srpage_stb	(srpage_stb)
+	);
+
+	epcs epcs
+	(
+		.clk		(clk1),
+		.data_in	(zxbdata_in),
+		.data_out	(epcs_data_out),
+		.ectrl_stb	(ectrl_stb),
+		.edata_stb	(edata_stb),
+		.ncso		(NCSO),
+		.asdo		(ASDO),
+		.dclk		(DCLK),
+		.data0		(DATA0)
 	);
 
 	sound sound
@@ -152,14 +175,6 @@ module fpga_kick
 		.soundbit_r	(soundbit_r)
 	);
 
-	pll	pll
-	(
-		.inclk0 (CLK_IN),	// 50 MHz
-		.c0     (clk0),		// 225 MHz
-		.c1     (clk1),		// 112.5 MHz
-		.c2     (clk2)		// 56.25 MHz
-	);
-
 	sxga sxga
 	(
 		.clk 		(V_CLK),
@@ -168,8 +183,10 @@ module fpga_kick
 		.b   		(V_B),
 		.hs  		(V_HS),
 		.vs  		(V_VS),
-		.waddr		(zxbaddr),
-		.srpage		(srpage),
+		.data_in	(zxbdata_in),
+		.zxbaddr	(zxbaddr),
+		.sxgamem_en	(sxgamem_en),
+		.srpage_stb	(srpage_stb),
         .wstb       (zxbmem_req && !zxb_rnw),
 		.sram_dq    (SR_D),
 		.sram_addr  (SR_A),
@@ -180,4 +197,12 @@ module fpga_kick
 		.key		(~test[3:0])
 	);
 
+	pll	pll
+	(
+		.inclk0 (CLK_IN),	// 50 MHz
+		.c0     (clk0),		// 225 MHz
+		.c1     (clk1),		// 112.5 MHz
+		.c2     (clk2)		// 56.25 MHz
+	);
+	
 endmodule
