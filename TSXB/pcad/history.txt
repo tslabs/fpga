@@ -1,0 +1,6 @@
+Rev.A
+Changes from tsxb.sch to tsxb_mod.sch:
+- 16245.1x[7:0] disconnected
+- 16245.1DIR moved from DDIR to VCC3.3
+- FPGA pins 33, 34, 35, 37, 39, 40, 41, 43 disconnected
+- FPGA.MSEL0 connected to CPLD via 75R
